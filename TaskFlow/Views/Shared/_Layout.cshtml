@@ -13,7 +13,9 @@
 <body>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+            <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                @* Logo będzie tutaj: *@
+                @* <img src="~/images/logo.png" alt="TaskFlow" style="height: 40px; margin-right: 10px;" /> *@
                 <strong>TaskFlow</strong>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -57,11 +59,33 @@
                 <ul class="navbar-nav">
                     @if (User.Identity?.IsAuthenticated ?? false)
                     {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Settings" asp-action="Index">⚙️ Ustawienia</a>
+                        </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                👤 @User.Identity.Name
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="user-avatar me-2">
+                                    @{
+                                        var userName = User.Identity.Name ?? "?";
+                                        var initials = "";
+                                        var parts = userName.Split('@')[0].Split('.');
+                                        if (parts.Length >= 2)
+                                        {
+                                            initials = parts[0].Substring(0, 1).ToUpper() + parts[1].Substring(0, 1).ToUpper();
+                                        }
+                                        else
+                                        {
+                                            initials = userName.Substring(0, Math.Min(2, userName.Length)).ToUpper();
+                                        }
+                                    }
+                                    @initials
+                                </div>
+                                <div class="d-none d-md-block">
+                                    <small class="d-block text-muted" style="font-size: 0.7rem; line-height: 1;">Zalogowany jako</small>
+                                    <span>@User.Identity.Name</span>
+                                </div>
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 @if (User.IsInRole("Admin"))
                                 {
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Register">Rejestracja użytkownika</a></li>

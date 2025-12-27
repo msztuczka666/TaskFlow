@@ -1,8 +1,10 @@
 ﻿@model TaskFlow.ViewModels.DziennikGodzinViewModel
 @{
     ViewData["Title"] = "Dziennik Godzin";
-    Layout = "_DashboardLayout";
+    Layout = "_Layout";
 }
+
+<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 
 @if (User.Identity?.IsAuthenticated ?? false)
 {

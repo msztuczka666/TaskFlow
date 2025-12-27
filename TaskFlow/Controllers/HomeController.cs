@@ -22,7 +22,7 @@ public class HomeController : Controller
         ViewBag.TotalPracownicy = await _context.Pracownicy.CountAsync();
         ViewBag.TotalZlecenia = await _context.Zlecenia.CountAsync();
         ViewBag.AktywneZlecenia = await _context.Zlecenia
-            .Where(z => z.Status == StatusyZlecenia.WTrakcie || z.Status == StatusyZlecenia.Nowe)
+            .Where(z => z.Status == StatusyZlecenia.Aktywne)
             .CountAsync();
         
         // SEP Expiry warnings (30 days)

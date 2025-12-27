@@ -42,7 +42,7 @@ namespace TaskFlow.Data
             modelBuilder.Entity<Zlecenie>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Nazwa).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Opis).IsRequired().HasMaxLength(1000);
             });
         }
     }

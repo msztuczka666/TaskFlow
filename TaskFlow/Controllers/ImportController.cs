@@ -50,8 +50,8 @@ namespace TaskFlow.Controllers
                         {
                             Imie = worksheet.Cells[row, 1].Value?.ToString() ?? "",
                             Nazwisko = worksheet.Cells[row, 2].Value?.ToString() ?? "",
-                            FirmaGlowna = worksheet.Cells[row, 3].Value?.ToString(),
-                            FirmaIdentyfikatorowa = worksheet.Cells[row, 4].Value?.ToString(),
+                            Firma = worksheet.Cells[row, 3].Value?.ToString(),
+                            FirmaId = worksheet.Cells[row, 4].Value?.ToString(),
                         };
 
                         // Parse SEP date if present

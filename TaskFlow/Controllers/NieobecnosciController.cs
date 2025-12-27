@@ -81,6 +81,9 @@ namespace TaskFlow.Controllers
                     nieobecnosc.LiczbaDni = TypyNieobecnosci.DomyslneLimitDni[nieobecnosc.TypNieobecnosci];
                 }
 
+                // Calculate hours based on absence type
+                nieobecnosc.LiczbaGodzin = TypyNieobecnosci.ObliczGodziny(nieobecnosc.TypNieobecnosci, nieobecnosc.LiczbaDni);
+
                 _context.Add(nieobecnosc);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -132,6 +135,9 @@ namespace TaskFlow.Controllers
                     {
                         nieobecnosc.LiczbaDni = TypyNieobecnosci.DomyslneLimitDni[nieobecnosc.TypNieobecnosci];
                     }
+
+                    // Recalculate hours based on absence type
+                    nieobecnosc.LiczbaGodzin = TypyNieobecnosci.ObliczGodziny(nieobecnosc.TypNieobecnosci, nieobecnosc.LiczbaDni);
 
                     _context.Update(nieobecnosc);
                     await _context.SaveChangesAsync();

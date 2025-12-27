@@ -1,13 +1,6 @@
 ﻿@{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Witaj w systemie TaskFlow";
 }
-
-<div class="row mb-4">
-    <div class="col-12">
-        <h1 class="display-4">Dashboard</h1>
-        <p class="lead">Witaj w systemie TaskFlow</p>
-    </div>
-</div>
 
 @if (User.Identity?.IsAuthenticated ?? false)
 {
@@ -138,8 +131,8 @@ else
     <div class="row">
         <div class="col-12 text-center">
             <div class="jumbotron">
-                <h2>Witaj w TaskFlow</h2>
-                <p class="lead">System zarządzania zadaniami, czasem i frekwencją pracowników</p>
+                <h2>Witaj w systemie TaskFlow</h2>
+                <p class="lead">System zarządzania zleceniami, czasem i frekwencją pracowników</p>
                 <hr class="my-4">
                 <p>Zaloguj się, aby uzyskać dostęp do systemu</p>
                 <a class="btn btn-primary btn-lg" asp-controller="Account" asp-action="Login" role="button">Zaloguj się</a>

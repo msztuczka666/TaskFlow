@@ -6,40 +6,46 @@ namespace TaskFlow.Models
     {
         public int Id { get; set; }
 
-        [Required]
         [StringLength(200)]
-        public string Nazwa { get; set; } = string.Empty;
-
-        [StringLength(1000)]
-        public string? Opis { get; set; }
+        [Display(Name = "Nr zlecenia")]
+        public string? NrZlecenia { get; set; }
 
         [Required]
+        [StringLength(1000)]
+        [Display(Name = "Opis zlecenia")]
+        public string Opis { get; set; } = string.Empty;
+
+        [Required]
+        [Display(Name = "Data rozpoczęcia")]
         public DateTime DataRozpoczecia { get; set; }
 
         [Required]
+        [Display(Name = "Data zakończenia")]
         public DateTime DataZakonczenia { get; set; }
 
+        [Display(Name = "Ilość dni roboczych")]
         public int LiczbaDniRoboczych { get; set; }
 
         [StringLength(100)]
+        [Display(Name = "Status")]
         public string? Status { get; set; }
+
+        [StringLength(1000)]
+        [Display(Name = "Informacje")]
+        public string? Informacje { get; set; }
 
         public DateTime DataUtworzenia { get; set; } = DateTime.Now;
     }
 
     public static class StatusyZlecenia
     {
-        public const string Nowe = "Nowe";
-        public const string WTrakcie = "W trakcie";
+        public const string Aktywne = "Aktywne";
         public const string Zakonczone = "Zakończone";
-        public const string Wstrzymane = "Wstrzymane";
 
         public static List<string> Wszystkie => new()
         {
-            Nowe,
-            WTrakcie,
-            Zakonczone,
-            Wstrzymane
+            Aktywne,
+            Zakonczone
         };
     }
 }

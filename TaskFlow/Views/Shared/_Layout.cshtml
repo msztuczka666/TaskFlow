@@ -69,13 +69,17 @@
                                         var userName = User.Identity.Name ?? "?";
                                         var initials = "";
                                         var parts = userName.Split('@')[0].Split('.');
-                                        if (parts.Length >= 2)
+                                        if (parts.Length >= 2 && parts[0].Length > 0 && parts[1].Length > 0)
                                         {
                                             initials = parts[0].Substring(0, 1).ToUpper() + parts[1].Substring(0, 1).ToUpper();
                                         }
+                                        else if (userName.Length >= 2)
+                                        {
+                                            initials = userName.Substring(0, 2).ToUpper();
+                                        }
                                         else
                                         {
-                                            initials = userName.Substring(0, Math.Min(2, userName.Length)).ToUpper();
+                                            initials = userName.ToUpper();
                                         }
                                     }
                                     @initials

@@ -75,12 +75,20 @@
     <script>
         // Placeholder for theme toggle functionality
         document.getElementById('themeToggle').addEventListener('change', function() {
-            if(this.checked) {
-                alert('Tryb ciemny jest już aktywny');
-            } else {
-                alert('Tryb jasny będzie dostępny wkrótce');
-                this.checked = true; // Keep dark mode for now
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'alert alert-info alert-dismissible fade show mt-3';
+            messageDiv.innerHTML = this.checked ? 
+                'Tryb ciemny jest już aktywny. <button type="button" class="btn-close" data-bs-dismiss="alert"></button>' :
+                'Tryb jasny będzie dostępny wkrótce. <button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            
+            const container = document.querySelector('.card-body');
+            const existingAlert = container.querySelector('.alert');
+            if (existingAlert && !existingAlert.classList.contains('alert-info')) {
+                container.insertBefore(messageDiv, existingAlert);
             }
+            
+            // Keep dark mode for now
+            this.checked = true;
         });
     </script>
 }

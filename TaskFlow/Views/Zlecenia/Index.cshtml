@@ -1,0 +1,81 @@
+@model IEnumerable<TaskFlow.Models.Zlecenie>
+@{
+    ViewData["Title"] = "Zlecenia";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Zlecenia</h1>
+    @if (User.IsInRole("Admin") || User.IsInRole("Kierownik"))
+    {
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Dodaj zlecenie
+        </a>
+    }
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nazwa</th>
+                        <th>Data rozpoczęcia</th>
+                        <th>Data zakończenia</th>
+                        <th>Dni robocze</th>
+                        <th>Status</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Nazwa</td>
+                            <td>@item.DataRozpoczecia.ToString("dd.MM.yyyy")</td>
+                            <td>@item.DataZakonczenia.ToString("dd.MM.yyyy")</td>
+                            <td>@item.LiczbaDniRoboczych</td>
+                            <td>
+                                @switch (item.Status)
+                                {
+                                    case "Nowe":
+                                        <span class="badge bg-info">@item.Status</span>
+                                        break;
+                                    case "W trakcie":
+                                        <span class="badge bg-primary">@item.Status</span>
+                                        break;
+                                    case "Zakończone":
+                                        <span class="badge bg-success">@item.Status</span>
+                                        break;
+                                    case "Wstrzymane":
+                                        <span class="badge bg-warning text-dark">@item.Status</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-secondary">@item.Status</span>
+                                        break;
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Szczegóły</a>
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Kierownik") || User.IsInRole("Specjalista"))
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edytuj</a>
+                                    }
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Kierownik"))
+                                    {
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Usuń</a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">Brak zleceń w systemie.</div>
+        }
+    </div>
+</div>

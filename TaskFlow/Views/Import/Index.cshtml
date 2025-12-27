@@ -1,0 +1,81 @@
+@{
+    ViewData["Title"] = "Import danych";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Import pracowników z Excel</h5>
+            </div>
+            <div class="card-body">
+                <p>Format pliku Excel:</p>
+                <ul>
+                    <li>Kolumna 1: Imię</li>
+                    <li>Kolumna 2: Nazwisko</li>
+                    <li>Kolumna 3: Firma główna</li>
+                    <li>Kolumna 4: Firma identyfikatorowa</li>
+                    <li>Kolumna 5: Data ważności SEP (opcjonalnie)</li>
+                </ul>
+                <form asp-action="ImportPracownicy" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Wybierz plik Excel</label>
+                        <input type="file" name="file" class="form-control" accept=".xlsx,.xls" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Importuj pracowników</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Import nieobecności z Excel</h5>
+            </div>
+            <div class="card-body">
+                <p>Format pliku Excel:</p>
+                <ul>
+                    <li>Kolumna 1: ID Pracownika</li>
+                    <li>Kolumna 2: Data od (format: DD.MM.YYYY)</li>
+                    <li>Kolumna 3: Data do (format: DD.MM.YYYY)</li>
+                    <li>Kolumna 4: Typ nieobecności</li>
+                    <li>Kolumna 5: Uwagi (opcjonalnie)</li>
+                </ul>
+                <form asp-action="ImportNieobecnosci" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Wybierz plik Excel</label>
+                        <input type="file" name="file" class="form-control" accept=".xlsx,.xls" required />
+                    </div>
+                    <button type="submit" class="btn btn-success">Importuj nieobecności</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Dostępne typy nieobecności</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Urlop</li>
+                    <li>Choroba</li>
+                    <li>Szkolenie</li>
+                    <li>Odbiór krwi (automatycznie 2 dni)</li>
+                    <li>Okres zasiłek</li>
+                    <li>Działalność gospodarcza</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Powrót do Dashboard</a>
+</div>

@@ -21,9 +21,13 @@
                     <tr>
                         <th>Imię</th>
                         <th>Nazwisko</th>
-                        <th>Firma główna</th>
-                        <th>Firma identyfikatorowa</th>
-                        <th>SEP ważny do</th>
+                        <th>Firma</th>
+                        <th>Nr przepustki</th>
+                        <th>MPK</th>
+                        <th>Firma ID</th>
+                        <th>Stanowisko</th>
+                        <th>SEP nr</th>
+                        <th>SEP ważne do</th>
                         <th>Status SEP</th>
                         <th>Akcje</th>
                     </tr>
@@ -35,7 +39,11 @@
                             <td>@item.Imie</td>
                             <td>@item.Nazwisko</td>
                             <td>@item.Firma</td>
+                            <td>@item.NrPrzepustki</td>
+                            <td>@item.MPK</td>
                             <td>@item.FirmaId</td>
+                            <td>@item.Stanowisko</td>
+                            <td>@item.SEPNr</td>
                             <td>@(item.DataWaznosciSEP?.ToString("dd.MM.yyyy") ?? "-")</td>
                             <td>
                                 @if (item.DataWaznosciSEP.HasValue)

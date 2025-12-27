@@ -4,87 +4,317 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TaskFlow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TaskFlow.styles.css" asp-append-version="true" />
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3) !important;
+            padding: 18px 48px !important;
+        }
+
+        .navbar-brand {
+            font-size: 24px !important;
+            font-weight: 800 !important;
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+        }
+
+        .nav-link {
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            color: #64748b !important;
+            padding: 12px 20px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .nav-link:hover {
+            color: #93c5fd !important;
+            background: rgba(59, 130, 246, 0.1) !important;
+            border-radius: 8px !important;
+        }
+
+        .nav-link.active, .navbar-nav .nav-item.active .nav-link {
+            color: #60a5fa !important;
+            background: rgba(59, 130, 246, 0.1) !important;
+            border-radius: 8px !important;
+        }
+
+        .container {
+            max-width: 1600px;
+            background: #1a2332;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            padding: 32px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.3) 100%);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            color: #e2e8f0;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(30, 58, 138, 0.05) 100%);
+            border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        .table {
+            color: #e2e8f0;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid rgba(71, 85, 105, 0.3);
+            color: #94a3b8;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+        }
+
+        .table tbody tr:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            border: none;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(71, 85, 105, 0.1);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            color: #93c5fd;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border: none;
+            font-weight: 600;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border: none;
+            font-weight: 600;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            border: none;
+            font-weight: 600;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border: none;
+            font-weight: 600;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: #e2e8f0;
+            font-weight: 700;
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #86efac;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .form-control, .form-select {
+            background: rgba(15, 23, 42, 0.3);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            color: #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(15, 23, 42, 0.5);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            color: #e2e8f0;
+        }
+
+        .form-label {
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        footer {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.5) 100%);
+            border-top: 1px solid rgba(71, 85, 105, 0.3);
+            color: #64748b;
+            padding: 24px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .dropdown-menu {
+            background: #1a2332;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .dropdown-item {
+            color: #cbd5e1;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+        }
+
+        .badge {
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .badge-success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <strong>TaskFlow</strong>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        @if (User.Identity?.IsAuthenticated ?? false)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Dashboard</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Pracownicy" asp-action="Index">Pracownicy</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Nieobecnosci" asp-action="Index">Nieobecności</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Zlecenia" asp-action="Index">Zlecenia</a>
-                            </li>
-                            @if (User.IsInRole("Admin") || User.IsInRole("Kierownik"))
-                            {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle text-white" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Raporty
-                                    </a>
-                                    <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
-                                        <li><a class="dropdown-item" asp-controller="Reports" asp-action="MonthlyAbsences">Nieobecności miesięczne</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Reports" asp-action="SEPExpiryWarnings">Ostrzeżenia SEP</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Reports" asp-action="AbsenceSummaryByType">Podsumowanie wg typu</a></li>
-                                    </ul>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-white" asp-area="" asp-controller="Import" asp-action="Index">Import</a>
-                                </li>
-                            }
-                        }
-                    </ul>
-                    <ul class="navbar-nav">
-                        @if (User.Identity?.IsAuthenticated ?? false)
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <strong>TaskFlow</strong>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">📅 Dziennik godzin</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Pracownicy" ? "active" : "")" asp-area="" asp-controller="Pracownicy" asp-action="Index">👥 Pracownicy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Nieobecnosci" ? "active" : "")" asp-area="" asp-controller="Nieobecnosci" asp-action="Index">📋 Nieobecności</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Zlecenia" ? "active" : "")" asp-area="" asp-controller="Zlecenia" asp-action="Index">📦 Zlecenia</a>
+                        </li>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Kierownik"))
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    @User.Identity.Name
+                                <a class="nav-link dropdown-toggle @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    📈 Raporty
                                 </a>
-                                <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                                    @if (User.IsInRole("Admin"))
-                                    {
-                                        <li><a class="dropdown-item" asp-controller="Account" asp-action="Register">Rejestracja użytkownika</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                    }
-                                    <li>
-                                        <form asp-controller="Account" asp-action="Logout" method="post" class="px-3">
-                                            <button type="submit" class="btn btn-link dropdown-item">Wyloguj</button>
-                                        </form>
-                                    </li>
+                                <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Reports" asp-action="MonthlyAbsences">Nieobecności miesięczne</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Reports" asp-action="SEPExpiryWarnings">Ostrzeżenia SEP</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Reports" asp-action="AbsenceSummaryByType">Podsumowanie wg typu</a></li>
                                 </ul>
                             </li>
-                        }
-                        else
-                        {
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Account" asp-action="Login">Zaloguj</a>
+                                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Import" ? "active" : "")" asp-area="" asp-controller="Import" asp-action="Index">⬇️ Import</a>
                             </li>
                         }
-                    </ul>
-                </div>
+                    }
+                </ul>
+                <ul class="navbar-nav">
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                👤 @User.Identity.Name
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Register">Rejestracja użytkownika</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                }
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="px-3">
+                                        <button type="submit" class="btn btn-link dropdown-item">Wyloguj</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Login">Zaloguj</a>
+                        </li>
+                    }
+                </ul>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+    
     <div class="container">
         @if (TempData["Success"] != null)
         {
@@ -105,9 +335,9 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted mt-5">
+    <footer>
         <div class="container">
-            &copy; 2025 - TaskFlow - Synthraxis - Mariusz Sztuczka
+            © 2025 - TaskFlow - Synthraxis - Mariusz Sztuczka
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

@@ -92,7 +92,8 @@
                                         <select>
                                             @foreach (var zlecenie in Model.DostepneZlecenia)
                                             {
-                                                <option value="@zlecenie.Id" @(zlecenie.Id == segment.ZlecenieId ? "selected" : "")>
+                                                var isSelected = zlecenie.Id == segment.ZlecenieId;
+                                                <option value="@zlecenie.Id" selected="@isSelected">
                                                     @zlecenie.NrZlecenia • @zlecenie.Opis
                                                 </option>
                                             }

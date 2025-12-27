@@ -34,8 +34,8 @@
                         <tr>
                             <td>@item.Imie</td>
                             <td>@item.Nazwisko</td>
-                            <td>@item.FirmaGlowna</td>
-                            <td>@item.FirmaIdentyfikatorowa</td>
+                            <td>@item.Firma</td>
+                            <td>@item.FirmaId</td>
                             <td>@(item.DataWaznosciSEP?.ToString("dd.MM.yyyy") ?? "-")</td>
                             <td>
                                 @if (item.DataWaznosciSEP.HasValue)

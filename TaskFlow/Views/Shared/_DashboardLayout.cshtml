@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TaskFlow</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-left">
+                <h1>📊 Dziennik Godzin</h1>
+                <p>Zarządzanie czasem pracy i zleceniami</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="avatar">
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            var name = User.Identity.Name ?? "U";
+                            var parts = name.Split('@')[0].Split('.');
+                            var initials = parts.Length > 1 
+                                ? (parts[0][0].ToString() + parts[1][0].ToString()).ToUpper()
+                                : name.Substring(0, Math.Min(2, name.Length)).ToUpper();
+                            @initials
+                        }
+                        else
+                        {
+                            @:U
+                        }
+                    </div>
+                    <div class="user-details">
+                        <p>Zalogowany jako</p>
+                        <strong>@(User.Identity?.Name ?? "Guest")</strong>
+                        <small>@(User.IsInRole("Admin") ? "Administrator" : User.IsInRole("Kierownik") ? "Kierownik" : User.IsInRole("Specjalista") ? "Specjalista" : "Pracownik")</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NAVIGATION -->
+        <div class="nav-bar">
+            <a href="@Url.Action("Index", "Home")" class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">📅 Dziennik Godzin</a>
+            <a href="@Url.Action("Index", "Reports")" class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Reports" ? "active" : "")">📈 Raporty</a>
+            <a href="@Url.Action("Index", "Pracownicy")" class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Pracownicy" ? "active" : "")">👥 Pracownicy</a>
+            <a href="@Url.Action("Index", "Zlecenia")" class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Zlecenia" ? "active" : "")">📋 Zlecenia</a>
+            <a href="@Url.Action("Index", "Nieobecnosci")" class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Nieobecnosci" ? "active" : "")">🏖️ Nieobecności</a>
+            <a href="@Url.Action("Index", "Import")" class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Import" ? "active" : "")">📥 Import</a>
+            <a href="#" class="nav-item">⚙️ Ustawienia</a>
+        </div>
+
+        @RenderBody()
+        
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

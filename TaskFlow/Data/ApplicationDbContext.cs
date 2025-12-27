@@ -14,6 +14,7 @@ namespace TaskFlow.Data
         public DbSet<Pracownik> Pracownicy { get; set; }
         public DbSet<Nieobecnosc> Nieobecnosci { get; set; }
         public DbSet<Zlecenie> Zlecenia { get; set; }
+        public DbSet<EwidencjaCzasu> EwidencjaCzasu { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,6 +44,21 @@ namespace TaskFlow.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Opis).IsRequired().HasMaxLength(1000);
+            });
+
+            // Configure EwidencjaCzasu
+            modelBuilder.Entity<EwidencjaCzasu>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(e => e.Pracownik)
+                      .WithMany()
+                      .HasForeignKey(e => e.PracownikId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Zlecenie)
+                      .WithMany()
+                      .HasForeignKey(e => e.ZlecenieId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(e => new { e.Data, e.PracownikId });
             });
         }
     }

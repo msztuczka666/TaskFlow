@@ -1,128 +1,137 @@
-﻿@{
-    ViewData["Title"] = "Witaj w systemie TaskFlow";
+﻿@model TaskFlow.ViewModels.DziennikGodzinViewModel
+@{
+    ViewData["Title"] = "Dziennik Godzin";
+    Layout = "_DashboardLayout";
 }
 
 @if (User.Identity?.IsAuthenticated ?? false)
 {
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Pracownicy</h5>
-                    <p class="card-text display-6">@ViewBag.TotalPracownicy</p>
-                    <a asp-controller="Pracownicy" asp-action="Index" class="btn btn-light btn-sm">Zobacz listę</a>
-                </div>
+    <!-- TOP SECTION -->
+    <div class="top-section">
+        <div class="controls-row">
+            <div class="date-controls">
+                <a href="@Url.Action("Index", new { data = Model.WybranaData.AddDays(-1) })" class="date-button">◀ Wczoraj</a>
+                <div class="date-display">@Model.WybranaData.ToString("dd MMMM yyyy") • @Model.WybranaData.ToString("dddd")</div>
+                <a href="@Url.Action("Index", new { data = Model.WybranaData.AddDays(1) })" class="date-button">Jutro ▶</a>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Zlecenia</h5>
-                    <p class="card-text display-6">@ViewBag.TotalZlecenia</p>
-                    <a asp-controller="Zlecenia" asp-action="Index" class="btn btn-light btn-sm">Zobacz listę</a>
-                </div>
+            <div style="flex: 1;"></div>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                Zapisane
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Aktywne Zlecenia</h5>
-                    <p class="card-text display-6">@ViewBag.AktywneZlecenia</p>
-                    <a asp-controller="Zlecenia" asp-action="Index" class="btn btn-light btn-sm">Zobacz</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Ostrzeżenia SEP</h5>
-                    <p class="card-text display-6">@ViewBag.SEPWarnings.Count</p>
-                    <a asp-controller="Reports" asp-action="SEPExpiryWarnings" class="btn btn-light btn-sm">Zobacz</a>
-                </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary">⬇️ Z wczoraj</button>
+                <button class="btn btn-secondary">📋 Szablon</button>
             </div>
         </div>
     </div>
 
-    @if (ViewBag.SEPWarnings.Count > 0)
-    {
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card border-warning">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Ostrzeżenia - wygasające certyfikaty SEP (30 dni)</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Pracownik</th>
-                                        <th>Data wygaśnięcia</th>
-                                        <th>Dni do wygaśnięcia</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var pracownik in ViewBag.SEPWarnings)
-                                    {
-                                        <tr>
-                                            <td>@pracownik.Imie @pracownik.Nazwisko</td>
-                                            <td>@pracownik.DataWaznosciSEP?.ToString("dd.MM.yyyy")</td>
-                                            <td>
-                                                <span class="badge bg-warning text-dark">@pracownik.DniDoWygasniecia dni</span>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        
+        <!-- SUMMARY -->
+        <div class="summary-box">
+            <div class="summary-item">
+                <label>Pracowników</label>
+                <value>@Model.Podsumowanie.LiczbaPracownikow</value>
+            </div>
+            <div class="summary-item">
+                <label>Razem godzin</label>
+                <value>@string.Format("{0:0}:{1:00}", Math.Floor(Model.Podsumowanie.RazemGodzin), (Model.Podsumowanie.RazemGodzin % 1) * 60)</value>
+            </div>
+            <div class="summary-item">
+                <label>Nadgodziny</label>
+                <value>@string.Format("{0:0}:{1:00}", Math.Floor(Model.Podsumowanie.Nadgodziny), (Model.Podsumowanie.Nadgodziny % 1) * 60)</value>
+            </div>
+            <div class="summary-item">
+                <label>Do rozliczenia</label>
+                <value>@string.Format("{0:0}:{1:00}", Math.Floor(Model.Podsumowanie.DoRozliczenia), (Model.Podsumowanie.DoRozliczenia % 1) * 60)</value>
             </div>
         </div>
-    }
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Ostatnie nieobecności</h5>
-                </div>
-                <div class="card-body">
-                    @if (ViewBag.RecentNieobecnosci.Count > 0)
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Pracownik</th>
-                                        <th>Typ</th>
-                                        <th>Data od</th>
-                                        <th>Data do</th>
-                                        <th>Dni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var nieobecnosc in ViewBag.RecentNieobecnosci)
-                                    {
-                                        <tr>
-                                            <td>@nieobecnosc.Pracownik.Imie @nieobecnosc.Pracownik.Nazwisko</td>
-                                            <td><span class="badge bg-secondary">@nieobecnosc.TypNieobecnosci</span></td>
-                                            <td>@nieobecnosc.DataOd.ToString("dd.MM.yyyy")</td>
-                                            <td>@nieobecnosc.DataDo.ToString("dd.MM.yyyy")</td>
-                                            <td>@nieobecnosc.LiczbaDni</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+        <!-- WORKERS -->
+        <div class="worker-cards">
+            @foreach (var pracownik in Model.Pracownicy)
+            {
+                <div class="worker-card">
+                    <div class="worker-header">
+                        <div class="worker-name">
+                            <div class="worker-avatar">@pracownik.Inicjaly</div>
+                            <div class="worker-info">
+                                <h3>@pracownik.Imie @pracownik.Nazwisko</h3>
+                                <p>@pracownik.Firma • @pracownik.FirmaId • @pracownik.Stanowisko</p>
+                            </div>
                         </div>
-                        <a asp-controller="Nieobecnosci" asp-action="Index" class="btn btn-primary btn-sm">Zobacz wszystkie</a>
-                    }
-                    else
-                    {
-                        <p class="text-muted">Brak nieobecności</p>
-                    }
+                        <div class="worker-summary">
+                            <div class="worker-summary-item">
+                                <span>Razem</span>
+                                <strong>@string.Format("{0:0}:{1:00}", Math.Floor(pracownik.SumaGodzin), (pracownik.SumaGodzin % 1) * 60)</strong>
+                            </div>
+                            <div class="worker-summary-item">
+                                <span>Nadgodziny</span>
+                                <strong>@string.Format("{0:0}:{1:00}", Math.Floor(pracownik.SumaNadgodzin), (pracownik.SumaNadgodzin % 1) * 60)</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="worker-content">
+                        @if (pracownik.Segmenty.Any())
+                        {
+                            @foreach (var segment in pracownik.Segmenty)
+                            {
+                                <div class="segment @(segment.CzyNadgodziny ? "overtime" : "")">
+                                    <div class="form-group">
+                                        <label>Od</label>
+                                        <input type="time" value="@segment.GodzinaOd.ToString(@"hh\:mm")" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Do</label>
+                                        <input type="time" value="@segment.GodzinaDo.ToString(@"hh\:mm")" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Zlecenie</label>
+                                        <select>
+                                            @foreach (var zlecenie in Model.DostepneZlecenia)
+                                            {
+                                                <option value="@zlecenie.Id" @(zlecenie.Id == segment.ZlecenieId ? "selected" : "")>
+                                                    @zlecenie.NrZlecenia • @zlecenie.Opis
+                                                </option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Prace</label>
+                                        <textarea>@segment.OpisPrac</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Godziny</label>
+                                        <input type="text" value="@string.Format("{0:0}:{1:00}", Math.Floor(segment.LiczbaGodzin), (segment.LiczbaGodzin % 1) * 60)" disabled />
+                                    </div>
+                                    <div class="segment-actions">
+                                        <button class="icon-btn">📋</button>
+                                        <button class="icon-btn delete">✕</button>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        <button class="add-segment-btn">+ Dodaj kolejny segment (jeśli potrzeba)</button>
+                    </div>
                 </div>
-            </div>
+            }
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="footer-left">
+            Ostatnia zmiana: <strong>@DateTime.Now.ToString("dd.MM.yyyy HH:mm")</strong> • @User.Identity.Name
+        </div>
+        <div class="footer-center">
+            System stworzony przez <a href="#">Mariusz Sztuczka</a> © 2025
+        </div>
+        <div class="footer-right">
+            <button class="btn-cancel">Anuluj</button>
+            <button class="btn-save">✓ Zapisz dzień</button>
         </div>
     </div>
 }

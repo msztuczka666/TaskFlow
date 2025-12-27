@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.Data;
 using TaskFlow.Models;
+using TaskFlow.ViewModels;
 
 namespace TaskFlow.Controllers;
 
@@ -17,28 +18,84 @@ public class HomeController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(DateTime? data)
     {
-        ViewBag.TotalPracownicy = await _context.Pracownicy.CountAsync();
-        ViewBag.TotalZlecenia = await _context.Zlecenia.CountAsync();
-        ViewBag.AktywneZlecenia = await _context.Zlecenia
-            .Where(z => z.Status == StatusyZlecenia.Aktywne)
-            .CountAsync();
-        
-        // SEP Expiry warnings (30 days)
-        var sepExpiryDate = DateTime.Now.AddDays(30);
-        ViewBag.SEPWarnings = await _context.Pracownicy
-            .Where(p => p.DataWaznosciSEP.HasValue && p.DataWaznosciSEP.Value <= sepExpiryDate && p.DataWaznosciSEP.Value >= DateTime.Now)
+        var wybranaData = data ?? DateTime.Today;
+
+        var model = new DziennikGodzinViewModel
+        {
+            WybranaData = wybranaData,
+            DostepneZlecenia = await _context.Zlecenia
+                .Where(z => z.Status == StatusyZlecenia.Aktywne)
+                .OrderBy(z => z.NrZlecenia)
+                .ToListAsync()
+        };
+
+        // Pobierz wszystkich pracowników
+        var wszyscyPracownicy = await _context.Pracownicy
+            .OrderBy(p => p.Nazwisko)
+            .ThenBy(p => p.Imie)
             .ToListAsync();
 
-        // Recent absences
-        ViewBag.RecentNieobecnosci = await _context.Nieobecnosci
-            .Include(n => n.Pracownik)
-            .OrderByDescending(n => n.DataOd)
-            .Take(5)
+        // Pobierz ewidencję czasu dla wybranej daty
+        var ewidencja = await _context.EwidencjaCzasu
+            .Include(e => e.Pracownik)
+            .Include(e => e.Zlecenie)
+            .Where(e => e.Data.Date == wybranaData.Date)
             .ToListAsync();
 
-        return View();
+        // Przygotuj dane dla każdego pracownika
+        foreach (var pracownik in wszyscyPracownicy)
+        {
+            var segmentyPracownika = ewidencja
+                .Where(e => e.PracownikId == pracownik.Id)
+                .Select(e => new SegmentPracyViewModel
+                {
+                    Id = e.Id,
+                    GodzinaOd = e.GodzinaOd,
+                    GodzinaDo = e.GodzinaDo,
+                    ZlecenieId = e.ZlecenieId,
+                    OpisPrac = e.OpisPrac,
+                    LiczbaGodzin = e.LiczbaGodzin,
+                    CzyNadgodziny = e.Nadgodziny > 0
+                })
+                .ToList();
+
+            var sumaGodzin = segmentyPracownika.Sum(s => s.LiczbaGodzin);
+            var sumaNadgodzin = segmentyPracownika.Where(s => s.CzyNadgodziny).Sum(s => s.LiczbaGodzin);
+
+            model.Pracownicy.Add(new PracownikDzienViewModel
+            {
+                PracownikId = pracownik.Id,
+                Imie = pracownik.Imie,
+                Nazwisko = pracownik.Nazwisko,
+                Firma = pracownik.Firma ?? "",
+                FirmaId = pracownik.FirmaId ?? "",
+                Stanowisko = pracownik.Stanowisko ?? "",
+                Inicjaly = GetInitials(pracownik.Imie, pracownik.Nazwisko),
+                Segmenty = segmentyPracownika,
+                SumaGodzin = sumaGodzin,
+                SumaNadgodzin = sumaNadgodzin
+            });
+        }
+
+        // Oblicz podsumowanie
+        model.Podsumowanie = new PodsumowanieDniaViewModel
+        {
+            LiczbaPracownikow = model.Pracownicy.Count(p => p.Segmenty.Any()),
+            RazemGodzin = model.Pracownicy.Sum(p => p.SumaGodzin - p.SumaNadgodzin),
+            Nadgodziny = model.Pracownicy.Sum(p => p.SumaNadgodzin),
+            DoRozliczenia = model.Pracownicy.Sum(p => p.SumaGodzin)
+        };
+
+        return View(model);
+    }
+
+    private string GetInitials(string imie, string nazwisko)
+    {
+        var i = !string.IsNullOrEmpty(imie) ? imie[0].ToString().ToUpper() : "";
+        var n = !string.IsNullOrEmpty(nazwisko) ? nazwisko[0].ToString().ToUpper() : "";
+        return i + n;
     }
 
     public IActionResult Privacy()

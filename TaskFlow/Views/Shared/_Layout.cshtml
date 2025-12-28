@@ -74,6 +74,11 @@
                                         {
                                             displayName = $"{currentUser.Imie} {currentUser.Nazwisko}";
                                             initials = currentUser.Imie[0].ToString().ToUpper() + currentUser.Nazwisko[0].ToString().ToUpper();
+                                            
+                                            // Use the Stanowisko field from database
+                                            userPosition = !string.IsNullOrEmpty(currentUser.Stanowisko) 
+                                                ? currentUser.Stanowisko 
+                                                : "Pracownik";
                                         }
                                         else
                                         {
@@ -92,20 +97,20 @@
                                             {
                                                 initials = userName.ToUpper();
                                             }
-                                        }
-                                        
-                                        // Determine position based on role
-                                        if (User.IsInRole("Admin"))
-                                        {
-                                            userPosition = "Administrator";
-                                        }
-                                        else if (User.IsInRole("Kierownik"))
-                                        {
-                                            userPosition = "Kierownik";
-                                        }
-                                        else
-                                        {
-                                            userPosition = "Pracownik";
+                                            
+                                            // Fallback position determination based on role
+                                            if (User.IsInRole("Admin"))
+                                            {
+                                                userPosition = "Administrator";
+                                            }
+                                            else if (User.IsInRole("Kierownik"))
+                                            {
+                                                userPosition = "Kierownik";
+                                            }
+                                            else
+                                            {
+                                                userPosition = "Pracownik";
+                                            }
                                         }
                                     }
                                     @initials

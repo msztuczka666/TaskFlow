@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "Dziennik Godzin";
     Layout = "_Layout";
+    var wybranaDataStr = Model.WybranaData.ToString("yyyy-MM-dd");
+    var poprzedniDzienStr = Model.WybranaData.AddDays(-1).ToString("yyyy-MM-dd");
 }
 
 <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
@@ -10,20 +12,28 @@
 {
     <!-- TOP SECTION -->
     <div class="top-section">
+        <!-- Current Date/Time Display -->
+        <div class="current-datetime">
+            <div class="current-date" id="currentDate"></div>
+            <div class="current-time" id="currentTime"></div>
+        </div>
+
         <div class="controls-row">
             <div class="date-controls">
                 <a href="@Url.Action("Index", new { data = Model.WybranaData.AddDays(-1) })" class="date-button">◀ Wczoraj</a>
-                <div class="date-display">@Model.WybranaData.ToString("dd MMMM yyyy") • @Model.WybranaData.ToString("dddd")</div>
+                <div class="date-display">
+                    <input type="date" id="selectedDate" value="@wybranaDataStr" class="date-picker" />
+                    <span class="day-name">@Model.WybranaData.ToString("dddd")</span>
+                </div>
                 <a href="@Url.Action("Index", new { data = Model.WybranaData.AddDays(1) })" class="date-button">Jutro ▶</a>
             </div>
             <div style="flex: 1;"></div>
-            <div class="status-badge">
+            <div class="status-badge" id="statusBadge">
                 <div class="status-dot"></div>
-                Zapisane
+                <span id="statusText">Zapisany</span>
             </div>
             <div class="action-buttons">
-                <button class="btn btn-secondary">⬇️ Z wczoraj</button>
-                <button class="btn btn-secondary">📋 Szablon</button>
+                <button class="btn btn-secondary" id="copyFromPreviousBtn" onclick="copyFromPreviousDay()">📥 Skopiuj z dnia poprzedniego</button>
             </div>
         </div>
     </div>
@@ -34,93 +44,25 @@
         <!-- SUMMARY -->
         <div class="summary-box">
             <div class="summary-item">
-                <label>Pracowników</label>
-                <value>@Model.Podsumowanie.LiczbaPracownikow</value>
+                <label>Ilość pracowników</label>
+                <value id="statPracownikow">0</value>
             </div>
             <div class="summary-item">
                 <label>Razem godzin</label>
-                <value>@string.Format("{0:0}:{1:00}", Math.Floor(Model.Podsumowanie.RazemGodzin), (Model.Podsumowanie.RazemGodzin % 1) * 60)</value>
+                <value id="statGodzin">0:00</value>
             </div>
             <div class="summary-item">
-                <label>Nadgodziny</label>
-                <value>@string.Format("{0:0}:{1:00}", Math.Floor(Model.Podsumowanie.Nadgodziny), (Model.Podsumowanie.Nadgodziny % 1) * 60)</value>
-            </div>
-            <div class="summary-item">
-                <label>Do rozliczenia</label>
-                <value>@string.Format("{0:0}:{1:00}", Math.Floor(Model.Podsumowanie.DoRozliczenia), (Model.Podsumowanie.DoRozliczenia % 1) * 60)</value>
+                <label>Razem nadgodzin</label>
+                <value id="statNadgodzin">0:00</value>
             </div>
         </div>
 
-        <!-- WORKERS -->
-        <div class="worker-cards">
-            @foreach (var pracownik in Model.Pracownicy)
-            {
-                <div class="worker-card">
-                    <div class="worker-header">
-                        <div class="worker-name">
-                            <div class="worker-avatar">@pracownik.Inicjaly</div>
-                            <div class="worker-info">
-                                <h3>@pracownik.Imie @pracownik.Nazwisko</h3>
-                                <p>@pracownik.Firma • @pracownik.FirmaId • @pracownik.Stanowisko</p>
-                            </div>
-                        </div>
-                        <div class="worker-summary">
-                            <div class="worker-summary-item">
-                                <span>Razem</span>
-                                <strong>@string.Format("{0:0}:{1:00}", Math.Floor(pracownik.SumaGodzin), (pracownik.SumaGodzin % 1) * 60)</strong>
-                            </div>
-                            <div class="worker-summary-item">
-                                <span>Nadgodziny</span>
-                                <strong>@string.Format("{0:0}:{1:00}", Math.Floor(pracownik.SumaNadgodzin), (pracownik.SumaNadgodzin % 1) * 60)</strong>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="worker-content">
-                        @if (pracownik.Segmenty.Any())
-                        {
-                            @foreach (var segment in pracownik.Segmenty)
-                            {
-                                <div class="segment @(segment.CzyNadgodziny ? "overtime" : "")">
-                                    <div class="form-group">
-                                        <label>Od</label>
-                                        <input type="time" value="@segment.GodzinaOd.ToString(@"hh\:mm")" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Do</label>
-                                        <input type="time" value="@segment.GodzinaDo.ToString(@"hh\:mm")" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Zlecenie</label>
-                                        <select>
-                                            @foreach (var zlecenie in Model.DostepneZlecenia)
-                                            {
-                                                var isSelected = zlecenie.Id == segment.ZlecenieId;
-                                                <option value="@zlecenie.Id" selected="@isSelected">
-                                                    @zlecenie.NrZlecenia • @zlecenie.Opis
-                                                </option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Prace</label>
-                                        <textarea>@segment.OpisPrac</textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Godziny</label>
-                                        <input type="text" value="@string.Format("{0:0}:{1:00}", Math.Floor(segment.LiczbaGodzin), (segment.LiczbaGodzin % 1) * 60)" disabled />
-                                    </div>
-                                    <div class="segment-actions">
-                                        <button class="icon-btn">📋</button>
-                                        <button class="icon-btn delete">✕</button>
-                                    </div>
-                                </div>
-                            }
-                        }
-                        <button class="add-segment-btn">+ Dodaj kolejny segment (jeśli potrzeba)</button>
-                    </div>
-                </div>
-            }
+        <!-- TIME ENTRIES FORM -->
+        <div class="entries-container" id="entriesContainer">
+            <!-- Dynamic entries will be added here -->
         </div>
+
+        <button class="add-entry-btn" id="addEntryBtn" onclick="addEntry()">+ Kolejna praca</button>
 
     </div>
 
@@ -130,13 +72,354 @@
             Ostatnia zmiana: <strong>@DateTime.Now.ToString("dd.MM.yyyy HH:mm")</strong> • @User.Identity.Name
         </div>
         <div class="footer-center">
-            System stworzony przez <a href="#">Mariusz Sztuczka</a> © 2025
+            © 2025 - TaskFlow - Synthraxis - Mariusz Sztuczka
         </div>
         <div class="footer-right">
-            <button class="btn-cancel">Anuluj</button>
-            <button class="btn-save">✓ Zapisz dzień</button>
+            <button class="btn-cancel" onclick="cancelChanges()">Anuluj</button>
+            <button class="btn-save" onclick="saveDay()">✓ Zapisz</button>
         </div>
     </div>
+
+    <!-- JavaScript for Dynamic Functionality -->
+    <script>
+        // Data from server
+        const selectedDate = '@wybranaDataStr';
+        const previousDate = '@poprzedniDzienStr';
+        const pracownicy = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Pracownicy.Select(p => new { 
+            Id = p.PracownikId, 
+            Imie = p.Imie, 
+            Nazwisko = p.Nazwisko,
+            Firma = p.Firma,
+            FirmaId = p.FirmaId,
+            Stanowisko = p.Stanowisko
+        })));
+        const zlecenia = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DostepneZlecenia.Select(z => new { 
+            Id = z.Id, 
+            NrZlecenia = z.NrZlecenia, 
+            Opis = z.Opis 
+        })));
+        const existingEntries = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Pracownicy.SelectMany(p => p.Segmenty.Select(s => new {
+            Id = s.Id,
+            PracownikId = p.PracownikId,
+            GodzinaOd = s.GodzinaOd.ToString(@"hh\:mm"),
+            GodzinaDo = s.GodzinaDo.ToString(@"hh\:mm"),
+            ZlecenieId = s.ZlecenieId,
+            OpisPrac = s.OpisPrac
+        }))));
+
+        let entries = [];
+        let isDirty = false;
+        let entryIdCounter = 1;
+
+        // Generate time options (every 30 minutes)
+        function generateTimeOptions() {
+            const options = [];
+            for (let h = 6; h <= 24; h++) {
+                for (let m = 0; m < 60; m += 30) {
+                    if (h === 24 && m > 0) break;
+                    const hour = h.toString().padStart(2, '0');
+                    const minute = m.toString().padStart(2, '0');
+                    options.push(`${hour}:${minute}`);
+                }
+            }
+            return options;
+        }
+
+        const timeOptions = generateTimeOptions();
+
+        // Update real-time clock
+        function updateClock() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('pl-PL', options);
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Date picker change handler
+        document.getElementById('selectedDate').addEventListener('change', function() {
+            window.location.href = '@Url.Action("Index")?data=' + this.value;
+        });
+
+        // Initialize with existing entries
+        function init() {
+            if (existingEntries && existingEntries.length > 0) {
+                entries = existingEntries.map((e, index) => ({
+                    id: e.Id || (1000 + index),
+                    pracownikId: e.PracownikId,
+                    godzinaOd: e.GodzinaOd,
+                    godzinaDo: e.GodzinaDo,
+                    zlecenieId: e.ZlecenieId,
+                    opisPrac: e.OpisPrac || ''
+                }));
+                entryIdCounter = Math.max(...entries.map(e => e.id)) + 1;
+            } else {
+                // Add one empty entry
+                addEntry();
+            }
+            renderEntries();
+            updateStatistics();
+        }
+
+        // Add new entry
+        function addEntry() {
+            const entry = {
+                id: entryIdCounter++,
+                pracownikId: pracownicy.length > 0 ? pracownicy[0].Id : null,
+                godzinaOd: '06:30',
+                godzinaDo: '14:30',
+                zlecenieId: zlecenia.length > 0 ? zlecenia[0].Id : null,
+                opisPrac: ''
+            };
+            entries.push(entry);
+            renderEntries();
+            updateStatistics();
+            markAsDirty();
+        }
+
+        // Remove entry
+        function removeEntry(id) {
+            entries = entries.filter(e => e.id !== id);
+            renderEntries();
+            updateStatistics();
+            markAsDirty();
+        }
+
+        // Calculate hours between two times
+        function calculateHours(godzinaOd, godzinaDo) {
+            if (!godzinaOd || !godzinaDo) return { total: 0, regular: 0, overtime: 0 };
+
+            const [h1, m1] = godzinaOd.split(':').map(Number);
+            const [h2, m2] = godzinaDo.split(':').map(Number);
+            
+            const minutesFrom = h1 * 60 + m1;
+            const minutesTo = h2 * 60 + m2;
+            const totalMinutes = minutesTo - minutesFrom;
+
+            if (totalMinutes <= 0) return { total: 0, regular: 0, overtime: 0 };
+
+            const total = totalMinutes / 60;
+
+            // Regular hours: 6:30 - 14:30 (8 hours)
+            const regularEndMinutes = 14 * 60 + 30; // 14:30
+
+            let regularMinutes = 0;
+            let overtimeMinutes = 0;
+
+            if (minutesTo <= regularEndMinutes) {
+                // All work is regular hours
+                regularMinutes = totalMinutes;
+            } else if (minutesFrom >= regularEndMinutes) {
+                // All work is overtime
+                overtimeMinutes = totalMinutes;
+            } else {
+                // Work spans both regular and overtime
+                regularMinutes = regularEndMinutes - minutesFrom;
+                overtimeMinutes = minutesTo - regularEndMinutes;
+            }
+
+            return {
+                total: total,
+                regular: regularMinutes / 60,
+                overtime: overtimeMinutes / 60
+            };
+        }
+
+        // Format hours for display
+        function formatHours(hours) {
+            const h = Math.floor(hours);
+            const m = Math.round((hours - h) * 60);
+            return `${h}:${m.toString().padStart(2, '0')}`;
+        }
+
+        // Render all entries
+        function renderEntries() {
+            const container = document.getElementById('entriesContainer');
+            container.innerHTML = '';
+
+            entries.forEach((entry, index) => {
+                const hours = calculateHours(entry.godzinaOd, entry.godzinaDo);
+                const isOvertime = hours.overtime > 0;
+
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'entry-row' + (isOvertime ? ' has-overtime' : '');
+                entryDiv.innerHTML = `
+                    <div class="form-group">
+                        <label>Pracownik</label>
+                        <select onchange="updateEntry(${entry.id}, 'pracownikId', parseInt(this.value))">
+                            ${pracownicy.map(p => `<option value="${p.Id}" ${p.Id === entry.pracownikId ? 'selected' : ''}>${p.Imie} ${p.Nazwisko}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Godzina od</label>
+                        <select onchange="updateEntry(${entry.id}, 'godzinaOd', this.value)">
+                            ${timeOptions.map(t => `<option value="${t}" ${t === entry.godzinaOd ? 'selected' : ''}>${t}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Godzina do</label>
+                        <select onchange="updateEntry(${entry.id}, 'godzinaDo', this.value)">
+                            ${timeOptions.map(t => `<option value="${t}" ${t === entry.godzinaDo ? 'selected' : ''}>${t}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group form-group-wide">
+                        <label>Zlecenie</label>
+                        <select onchange="updateEntry(${entry.id}, 'zlecenieId', parseInt(this.value))">
+                            ${zlecenia.map(z => `<option value="${z.Id}" ${z.Id === entry.zlecenieId ? 'selected' : ''}>${z.NrZlecenia} - ${z.Opis}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group form-group-wide">
+                        <label>Prowadzone prace</label>
+                        <input type="text" value="${entry.opisPrac || ''}" 
+                               onchange="updateEntry(${entry.id}, 'opisPrac', this.value)" 
+                               placeholder="Opis wykonywanych prac..." />
+                    </div>
+                    <div class="form-group form-group-small">
+                        <label>Godzin</label>
+                        <input type="text" value="${formatHours(hours.total)}" disabled class="hours-display" />
+                    </div>
+                    <div class="entry-actions">
+                        <button class="icon-btn delete" onclick="removeEntry(${entry.id})" title="Usuń">✕</button>
+                    </div>
+                `;
+                container.appendChild(entryDiv);
+            });
+        }
+
+        // Update entry field
+        function updateEntry(id, field, value) {
+            const entry = entries.find(e => e.id === id);
+            if (entry) {
+                entry[field] = value;
+                renderEntries();
+                updateStatistics();
+                markAsDirty();
+            }
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            let uniquePracownicy = new Set();
+            let totalRegular = 0;
+            let totalOvertime = 0;
+
+            entries.forEach(entry => {
+                if (entry.pracownikId) {
+                    uniquePracownicy.add(entry.pracownikId);
+                }
+                const hours = calculateHours(entry.godzinaOd, entry.godzinaDo);
+                totalRegular += hours.regular;
+                totalOvertime += hours.overtime;
+            });
+
+            document.getElementById('statPracownikow').textContent = uniquePracownicy.size;
+            document.getElementById('statGodzin').textContent = formatHours(totalRegular);
+            document.getElementById('statNadgodzin').textContent = formatHours(totalOvertime);
+        }
+
+        // Mark as dirty (edited)
+        function markAsDirty() {
+            isDirty = true;
+            const badge = document.getElementById('statusBadge');
+            const statusText = document.getElementById('statusText');
+            badge.className = 'status-badge status-edited';
+            statusText.textContent = 'Edytowany';
+        }
+
+        // Mark as saved
+        function markAsSaved() {
+            isDirty = false;
+            const badge = document.getElementById('statusBadge');
+            const statusText = document.getElementById('statusText');
+            badge.className = 'status-badge';
+            statusText.textContent = 'Zapisany';
+        }
+
+        // Save day
+        async function saveDay() {
+            try {
+                const dataToSave = {
+                    data: selectedDate,
+                    entries: entries.map(e => ({
+                        pracownikId: e.pracownikId,
+                        godzinaOd: e.godzinaOd,
+                        godzinaDo: e.godzinaDo,
+                        zlecenieId: e.zlecenieId,
+                        opisPrac: e.opisPrac || ''
+                    }))
+                };
+
+                const response = await fetch('@Url.Action("SaveDay")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataToSave)
+                });
+
+                if (response.ok) {
+                    markAsSaved();
+                    alert('Dzień został zapisany!');
+                } else {
+                    alert('Błąd podczas zapisywania!');
+                }
+            } catch (error) {
+                console.error('Error saving day:', error);
+                alert('Błąd podczas zapisywania!');
+            }
+        }
+
+        // Cancel changes
+        function cancelChanges() {
+            if (isDirty && !confirm('Czy na pewno chcesz anulować zmiany?')) {
+                return;
+            }
+            location.reload();
+        }
+
+        // Copy from previous day
+        async function copyFromPreviousDay() {
+            if (entries.length > 0 && !confirm('To nadpisze obecne wpisy. Kontynuować?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`@Url.Action("GetDayEntries")?data=${previousDate}`);
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    entries = data.map((e, index) => ({
+                        id: entryIdCounter++,
+                        pracownikId: e.pracownikId,
+                        godzinaOd: e.godzinaOd,
+                        godzinaDo: e.godzinaDo,
+                        zlecenieId: e.zlecenieId,
+                        opisPrac: e.opisPrac || ''
+                    }));
+                    renderEntries();
+                    updateStatistics();
+                    markAsDirty();
+                    alert('Skopiowano wpisy z poprzedniego dnia!');
+                } else {
+                    alert('Brak wpisów z poprzedniego dnia.');
+                }
+            } catch (error) {
+                console.error('Error copying from previous day:', error);
+                alert('Błąd podczas kopiowania!');
+            }
+        }
+
+        // Warn before leaving if there are unsaved changes
+        window.addEventListener('beforeunload', function (e) {
+            if (isDirty) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 }
 else
 {

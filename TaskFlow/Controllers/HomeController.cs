@@ -98,6 +98,101 @@ public class HomeController : Controller
         return i + n;
     }
 
+    [HttpPost]
+    public async Task<IActionResult> SaveDay([FromBody] SaveDayRequest request)
+    {
+        try
+        {
+            var dataObj = DateTime.Parse(request.Data);
+            
+            // Remove existing entries for this day
+            var existingEntries = await _context.EwidencjaCzasu
+                .Where(e => e.Data.Date == dataObj.Date)
+                .ToListAsync();
+            
+            _context.EwidencjaCzasu.RemoveRange(existingEntries);
+
+            // Add new entries
+            foreach (var entry in request.Entries)
+            {
+                var godzinaOd = TimeSpan.Parse(entry.GodzinaOd);
+                var godzinaDo = TimeSpan.Parse(entry.GodzinaDo);
+                var totalHours = (godzinaDo - godzinaOd).TotalHours;
+                
+                // Calculate overtime (after 14:30)
+                var regularEndTime = new TimeSpan(14, 30, 0);
+                decimal nadgodziny = 0;
+                decimal godzinyPodstawowe = 0;
+
+                if (godzinaDo <= regularEndTime)
+                {
+                    godzinyPodstawowe = (decimal)totalHours;
+                }
+                else if (godzinaOd >= regularEndTime)
+                {
+                    nadgodziny = (decimal)totalHours;
+                }
+                else
+                {
+                    godzinyPodstawowe = (decimal)(regularEndTime - godzinaOd).TotalHours;
+                    nadgodziny = (decimal)(godzinaDo - regularEndTime).TotalHours;
+                }
+
+                var ewidencja = new EwidencjaCzasu
+                {
+                    Data = dataObj,
+                    PracownikId = entry.PracownikId,
+                    ZlecenieId = entry.ZlecenieId,
+                    GodzinaOd = godzinaOd,
+                    GodzinaDo = godzinaDo,
+                    OpisPrac = entry.OpisPrac,
+                    LiczbaGodzin = (decimal)totalHours,
+                    Nadgodziny = nadgodziny,
+                    DataUtworzenia = DateTime.Now,
+                    UtworzonyPrzez = User.Identity?.Name ?? "System"
+                };
+
+                _context.EwidencjaCzasu.Add(ewidencja);
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error saving day");
+            return BadRequest();
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetDayEntries(string data)
+    {
+        try
+        {
+            var dataObj = DateTime.Parse(data);
+            
+            var entries = await _context.EwidencjaCzasu
+                .Where(e => e.Data.Date == dataObj.Date)
+                .Select(e => new
+                {
+                    pracownikId = e.PracownikId,
+                    godzinaOd = e.GodzinaOd.ToString(@"hh\:mm"),
+                    godzinaDo = e.GodzinaDo.ToString(@"hh\:mm"),
+                    zlecenieId = e.ZlecenieId,
+                    opisPrac = e.OpisPrac
+                })
+                .ToListAsync();
+
+            return Json(entries);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting day entries");
+            return Json(new List<object>());
+        }
+    }
+
     public IActionResult Privacy()
     {
         return View();
@@ -108,4 +203,19 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+}
+
+public class SaveDayRequest
+{
+    public string Data { get; set; } = string.Empty;
+    public List<TimeEntryDto> Entries { get; set; } = new();
+}
+
+public class TimeEntryDto
+{
+    public int PracownikId { get; set; }
+    public string GodzinaOd { get; set; } = string.Empty;
+    public string GodzinaDo { get; set; } = string.Empty;
+    public int ZlecenieId { get; set; }
+    public string? OpisPrac { get; set; }
 }

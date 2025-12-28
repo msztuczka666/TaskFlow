@@ -19,7 +19,8 @@
             <div class="mb-3">
                 <label asp-for="TypNieobecnosci" class="form-label">Typ nieobecności</label>
                 <select asp-for="TypNieobecnosci" class="form-select">
-                    @foreach (var typ in ViewBag.TypyNieobecnosci)
+                    <option value="">-- Wybierz typ nieobecności --</option>
+                    @foreach (var typ in (List<string>)ViewData["TypyNieobecnosci"])
                     {
                         <option value="@typ">@typ</option>
                     }

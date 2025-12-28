@@ -1,0 +1,67 @@
+@model TaskFlow.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Dodaj użytkownika";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Imie" class="control-label"></label>
+                <input asp-for="Imie" class="form-control" />
+                <span asp-validation-for="Imie" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Nazwisko" class="control-label"></label>
+                <input asp-for="Nazwisko" class="form-control" />
+                <span asp-validation-for="Nazwisko" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ConfirmPassword" class="control-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Stanowisko" class="control-label"></label>
+                <select asp-for="Stanowisko" class="form-control">
+                    <option value="">-- Wybierz stanowisko --</option>
+                    @foreach (var stanowisko in ViewData["Stanowiska"] as List<string>)
+                    {
+                        <option value="@stanowisko">@stanowisko</option>
+                    }
+                </select>
+                <span asp-validation-for="Stanowisko" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <button type="submit" class="btn btn-primary">💾 Zapisz</button>
+                <a asp-action="Index" class="btn btn-secondary">❌ Anuluj</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

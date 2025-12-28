@@ -1,0 +1,53 @@
+@model TaskFlow.ViewModels.UserListViewModel
+
+@{
+    ViewData["Title"] = "Usuń użytkownika";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="alert alert-danger">
+    <h4>⚠️ Czy na pewno chcesz usunąć tego użytkownika?</h4>
+    <p>Ta operacja jest <strong>nieodwracalna</strong>. Wszystkie dane użytkownika zostaną trwale usunięte.</p>
+</div>
+
+<hr />
+<dl class="row">
+    <dt class="col-sm-3">Imię</dt>
+    <dd class="col-sm-9">@Model.Imie</dd>
+
+    <dt class="col-sm-3">Nazwisko</dt>
+    <dd class="col-sm-9">@Model.Nazwisko</dd>
+
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@Model.Email</dd>
+
+    <dt class="col-sm-3">Stanowisko</dt>
+    <dd class="col-sm-9">
+        @if (!string.IsNullOrEmpty(Model.Stanowisko))
+        {
+            <span class="badge bg-info">@Model.Stanowisko</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary">Brak</span>
+        }
+    </dd>
+
+    <dt class="col-sm-3">Role</dt>
+    <dd class="col-sm-9">
+        @if (!string.IsNullOrEmpty(Model.Roles))
+        {
+            foreach (var role in Model.Roles.Split(", "))
+            {
+                <span class="badge @(role == "Admin" ? "bg-danger" : role == "Kierownik" ? "bg-warning" : "bg-success")">@role</span>
+            }
+        }
+    </dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit" class="btn btn-danger">🗑️ Usuń użytkownika</button>
+    <a asp-action="Index" class="btn btn-secondary">❌ Anuluj</a>
+</form>

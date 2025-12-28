@@ -1,0 +1,67 @@
+@model IEnumerable<TaskFlow.ViewModels.UserListViewModel>
+
+@{
+    ViewData["Title"] = "Zarządzanie użytkownikami";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>@ViewData["Title"]</h2>
+    <a asp-action="Create" class="btn btn-primary">➕ Dodaj użytkownika</a>
+</div>
+
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Imię</th>
+                    <th>Nazwisko</th>
+                    <th>Email</th>
+                    <th>Stanowisko</th>
+                    <th>Role</th>
+                    <th class="text-end">Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.Imie</td>
+                        <td>@user.Nazwisko</td>
+                        <td>@user.Email</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(user.Stanowisko))
+                            {
+                                <span class="badge bg-info">@user.Stanowisko</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Brak</span>
+                            }
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(user.Roles))
+                            {
+                                foreach (var role in user.Roles.Split(", "))
+                                {
+                                    <span class="badge @(role == "Admin" ? "bg-danger" : role == "Kierownik" ? "bg-warning" : "bg-success")">@role</span>
+                                }
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-outline-primary">✏️ Edytuj</a>
+                            <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-sm btn-outline-danger">🗑️ Usuń</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <strong>Brak użytkowników w systemie.</strong> Kliknij przycisk "Dodaj użytkownika" aby utworzyć nowego użytkownika.
+    </div>
+}

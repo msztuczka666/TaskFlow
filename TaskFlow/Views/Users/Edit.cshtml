@@ -1,0 +1,81 @@
+@model TaskFlow.ViewModels.EditUserViewModel
+
+@{
+    ViewData["Title"] = "Edytuj użytkownika";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Imie" class="control-label"></label>
+                <input asp-for="Imie" class="form-control" />
+                <span asp-validation-for="Imie" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Nazwisko" class="control-label"></label>
+                <input asp-for="Nazwisko" class="form-control" />
+                <span asp-validation-for="Nazwisko" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Stanowisko" class="control-label"></label>
+                <select asp-for="Stanowisko" class="form-control">
+                    <option value="">-- Wybierz stanowisko --</option>
+                    @foreach (var stanowisko in ViewData["Stanowiska"] as List<string>)
+                    {
+                        <option value="@stanowisko">@stanowisko</option>
+                    }
+                </select>
+                <span asp-validation-for="Stanowisko" class="text-danger"></span>
+            </div>
+
+            <hr />
+            <h4>Zmiana hasła (opcjonalnie)</h4>
+            <p class="text-muted">Pozostaw puste jeśli nie chcesz zmieniać hasła</p>
+
+            <div class="form-group mb-3">
+                <label asp-for="NewPassword" class="control-label"></label>
+                <input asp-for="NewPassword" class="form-control" />
+                <span asp-validation-for="NewPassword" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ConfirmPassword" class="control-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <hr />
+
+            <div class="form-group mb-3">
+                <button type="submit" class="btn btn-primary">💾 Zapisz</button>
+                <a asp-action="Index" class="btn btn-secondary">❌ Anuluj</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <div class="alert alert-info">
+            <h5>Informacje</h5>
+            <p><strong>Aktualne role:</strong> @string.Join(", ", Model.CurrentRoles)</p>
+            <p class="mb-0"><small>Role są automatycznie przypisywane na podstawie wybranego stanowiska.</small></p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

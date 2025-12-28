@@ -1,17 +1,8 @@
-@model TaskFlow.ViewModels.RegisterViewModel
 @{
     ViewData["Title"] = "Ustawienia";
 }
 
 <h1>⚙️ Ustawienia</h1>
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-}
 
 <div class="row mt-4">
     <div class="col-md-8">
@@ -38,77 +29,23 @@
             </div>
         </div>
 
-        <!-- User Registration (Admin Only) -->
+        <!-- User Management (Admin Only) -->
         @if (User.IsInRole("Admin"))
         {
             <div class="card mt-3">
                 <div class="card-header">
-                    <h3>Rejestracja nowego użytkownika</h3>
+                    <h3>Zarządzanie użytkownikami</h3>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Register" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Email" class="form-label"></label>
-                                <input asp-for="Email" class="form-control" placeholder="uzytkownik@example.com" />
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Stanowisko" class="form-label"></label>
-                                <select asp-for="Stanowisko" class="form-select">
-                                    <option value="">-- Wybierz stanowisko --</option>
-                                    @foreach (var stanowisko in (List<string>)ViewData["Stanowiska"])
-                                    {
-                                        <option value="@stanowisko">@stanowisko</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="Stanowisko" class="text-danger"></span>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Imie" class="form-label"></label>
-                                <input asp-for="Imie" class="form-control" />
-                                <span asp-validation-for="Imie" class="text-danger"></span>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Nazwisko" class="form-label"></label>
-                                <input asp-for="Nazwisko" class="form-control" />
-                                <span asp-validation-for="Nazwisko" class="text-danger"></span>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Password" class="form-label"></label>
-                                <input asp-for="Password" class="form-control" type="password" />
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                                <small class="form-text text-muted">Minimum 6 znaków</small>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ConfirmPassword" class="form-label"></label>
-                                <input asp-for="ConfirmPassword" class="form-control" type="password" />
-                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-3">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-person-plus"></i> Zarejestruj użytkownika
-                            </button>
-                        </div>
-                    </form>
+                    <p>Zarządzaj użytkownikami systemu - dodawaj, edytuj i usuwaj konta użytkowników.</p>
+                    <a asp-controller="Users" asp-action="Index" class="btn btn-primary">
+                        👥 Przejdź do zarządzania użytkownikami
+                    </a>
                     
                     <div class="alert alert-info mt-3">
                         <strong>Informacja o uprawnieniach:</strong>
                         <ul class="mb-0 mt-2">
-                            <li><strong>Administrator</strong> - Pełny dostęp do systemu, w tym Audit Log, Backup i rejestracja użytkowników</li>
+                            <li><strong>Administrator</strong> - Pełny dostęp do systemu, w tym zarządzanie użytkownikami</li>
                             <li><strong>Mistrz / Specjalista</strong> - Dostęp do edycji i zapisów danych</li>
                             <li><strong>Kierownik budowy / działu</strong> - Dostęp do raportów i zarządzania zespołem</li>
                             <li><strong>Gość</strong> - Dostęp tylko do odczytu</li>

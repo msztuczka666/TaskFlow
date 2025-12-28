@@ -318,21 +318,24 @@ namespace TaskFlow.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Firma")
-                        .HasMaxLength(200)
+                        .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FirmaId")
-                        .HasMaxLength(200)
+                        .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Imie")
                         .IsRequired()
-                        .HasMaxLength(100)
+                        .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Informacje")
-                        .HasMaxLength(1000)
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("LiczbaDniNaZadanie")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("LiczbaDniNaZeszycie")
                         .HasColumnType("INTEGER");
@@ -344,32 +347,36 @@ namespace TaskFlow.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("MPK")
-                        .HasMaxLength(100)
+                        .HasMaxLength(3)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Nazwisko")
                         .IsRequired()
-                        .HasMaxLength(100)
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NrPrzepustki")
-                        .HasMaxLength(100)
+                        .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SEPNapiecie")
-                        .HasMaxLength(100)
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SEPNr")
-                        .HasMaxLength(100)
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Stanowisko")
-                        .HasMaxLength(100)
+                        .HasMaxLength(30)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("StawkaZlH")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TypPracownika")
-                        .HasMaxLength(50)
+                        .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

@@ -1,11 +1,21 @@
+@model TaskFlow.ViewModels.RegisterViewModel
 @{
     ViewData["Title"] = "Ustawienia";
 }
 
 <h1>⚙️ Ustawienia</h1>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
 <div class="row mt-4">
     <div class="col-md-8">
+        <!-- Theme Settings -->
         <div class="card">
             <div class="card-header">
                 <h3>Wygląd</h3>
@@ -28,6 +38,87 @@
             </div>
         </div>
 
+        <!-- User Registration (Admin Only) -->
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h3>Rejestracja nowego użytkownika</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label"></label>
+                                <input asp-for="Email" class="form-control" placeholder="uzytkownik@example.com" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Stanowisko" class="form-label"></label>
+                                <select asp-for="Stanowisko" class="form-select">
+                                    <option value="">-- Wybierz stanowisko --</option>
+                                    @foreach (var stanowisko in (List<string>)ViewData["Stanowiska"])
+                                    {
+                                        <option value="@stanowisko">@stanowisko</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="Stanowisko" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Imie" class="form-label"></label>
+                                <input asp-for="Imie" class="form-control" />
+                                <span asp-validation-for="Imie" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Nazwisko" class="form-label"></label>
+                                <input asp-for="Nazwisko" class="form-control" />
+                                <span asp-validation-for="Nazwisko" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Password" class="form-label"></label>
+                                <input asp-for="Password" class="form-control" type="password" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                                <small class="form-text text-muted">Minimum 6 znaków</small>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ConfirmPassword" class="form-label"></label>
+                                <input asp-for="ConfirmPassword" class="form-control" type="password" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-person-plus"></i> Zarejestruj użytkownika
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="alert alert-info mt-3">
+                        <strong>Informacja o uprawnieniach:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>Administrator</strong> - Pełny dostęp do systemu, w tym Audit Log, Backup i rejestracja użytkowników</li>
+                            <li><strong>Mistrz / Specjalista</strong> - Dostęp do edycji i zapisów danych</li>
+                            <li><strong>Kierownik budowy / działu</strong> - Dostęp do raportów i zarządzania zespołem</li>
+                            <li><strong>Gość</strong> - Dostęp tylko do odczytu</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- System Information -->
         <div class="card mt-3">
             <div class="card-header">
                 <h3>Informacje o systemie</h3>
@@ -66,14 +157,73 @@
                         </tr>
                     </tbody>
                 </table>
+                
+                <div class="mt-3">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#licenseModal">
+                        <i class="bi bi-file-text"></i> Umowa licencyjna
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- License Agreement Modal -->
+<div class="modal fade" id="licenseModal" tabindex="-1" aria-labelledby="licenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="licenseModalLabel">Umowa licencyjna TaskFlow</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Umowa Licencyjna Oprogramowania TaskFlow v1.0.0</h6>
+                <p><em>Data wejścia w życie: 2025-01-01</em></p>
+                
+                <p>Niniejsza umowa licencyjna ("Umowa") reguluje zasady korzystania z oprogramowania TaskFlow ("Oprogramowanie").</p>
+                
+                <h6 class="mt-3">1. Udzielenie Licencji</h6>
+                <p>Właściciel oprogramowania udziela Użytkownikowi niewyłącznej, nieprzenoszalnej licencji na korzystanie z Oprogramowania zgodnie z warunkami niniejszej Umowy.</p>
+                
+                <h6 class="mt-3">2. Zakres Użytkowania</h6>
+                <p>Użytkownik jest uprawniony do:</p>
+                <ul>
+                    <li>Instalowania i używania Oprogramowania na urządzeniach będących własnością Użytkownika</li>
+                    <li>Tworzenia kopii zapasowych Oprogramowania</li>
+                    <li>Korzystania ze wszystkich funkcji Oprogramowania zgodnie z jego przeznaczeniem</li>
+                </ul>
+                
+                <h6 class="mt-3">3. Ograniczenia</h6>
+                <p>Użytkownik nie jest uprawniony do:</p>
+                <ul>
+                    <li>Dekompilacji, inżynierii wstecznej lub dezasemblacji Oprogramowania</li>
+                    <li>Usuwania lub modyfikowania oznaczeń praw autorskich</li>
+                    <li>Wykorzystywania Oprogramowania w sposób niezgodny z prawem</li>
+                    <li>Odsprzedaży lub sublicencjonowania Oprogramowania bez zgody Właściciela</li>
+                </ul>
+                
+                <h6 class="mt-3">4. Prawa Autorskie</h6>
+                <p>Wszystkie prawa autorskie do Oprogramowania należą do Właściciela. Oprogramowanie jest chronione prawami autorskimi i umowami międzynarodowymi.</p>
+                
+                <h6 class="mt-3">5. Gwarancja i Odpowiedzialność</h6>
+                <p>Oprogramowanie jest dostarczane "TAK JAK JEST". Właściciel nie udziela żadnych gwarancji, wyraźnych ani dorozumianych.</p>
+                
+                <h6 class="mt-3">6. Rozwiązanie Umowy</h6>
+                <p>Umowa może zostać rozwiązana przez Właściciela w przypadku naruszenia jej warunków przez Użytkownika.</p>
+                
+                <p class="mt-4"><strong>© 2025 - TaskFlow - Synthraxis - Mariusz Sztuczka</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
             </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
-        // Placeholder for theme toggle functionality
+        // Theme toggle functionality
         document.getElementById('themeToggle').addEventListener('change', function() {
             const messageDiv = document.createElement('div');
             messageDiv.className = 'alert alert-info alert-dismissible fade show mt-3';

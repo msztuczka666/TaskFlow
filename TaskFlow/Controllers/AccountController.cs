@@ -67,11 +67,22 @@ namespace TaskFlow.Controllers
                     UserName = model.Email,
                     Email = model.Email,
                     Imie = model.Imie,
-                    Nazwisko = model.Nazwisko
+                    Nazwisko = model.Nazwisko,
+                    Stanowisko = model.Stanowisko
                 };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    // Assign role based on Stanowisko
+                    string role = model.Stanowisko switch
+                    {
+                        "Administrator" => "Admin",
+                        "Kierownik budowy" or "Kierownik działu" => "Kierownik",
+                        "Specjalista" or "Mistrz" => "Specjalista",
+                        _ => "Pracownik"
+                    };
+                    await _userManager.AddToRoleAsync(user, role);
+                    
                     return RedirectToAction(nameof(Login));
                 }
                 foreach (var error in result.Errors)

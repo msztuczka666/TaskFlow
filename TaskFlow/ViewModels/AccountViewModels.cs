@@ -43,5 +43,9 @@ namespace TaskFlow.ViewModels
         [Display(Name = "Potwierdź hasło")]
         [Compare("Password", ErrorMessage = "Hasła nie są identyczne.")]
         public string ConfirmPassword { get; set; } = string.Empty;
+        
+        [Required]
+        [Display(Name = "Stanowisko")]
+        public string Stanowisko { get; set; } = string.Empty;
     }
 }

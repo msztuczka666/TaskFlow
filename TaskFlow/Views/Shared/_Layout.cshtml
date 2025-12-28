@@ -117,11 +117,6 @@
                                 </div>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Register">Rejestracja użytkownika</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                }
                                 <li>
                                     <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                         <button type="submit" class="dropdown-item">Wyloguj</button>

@@ -1,0 +1,106 @@
+@{
+    ViewData["Title"] = "Raporty";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4">📊 Raporty</h1>
+            <p class="lead">Dynamiczne raporty z danych w systemie TaskFlow</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Report 1: Employee Hours -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">👥 Ilość godzin pracowników</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Raport pokazujący ilość godzin przepracowanych przez pracowników w wybranych okresach.
+                    </p>
+                    <ul class="small">
+                        <li>Filtrowanie: Rok, Miesiąc, MPK, Firma</li>
+                        <li>Lista pracowników z godzinami dziennie</li>
+                        <li>Bez mnożników nadgodzin</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="@Url.Action("EmployeeHours", "Reports")" class="btn btn-primary w-100">
+                        <i class="bi bi-file-earmark-bar-graph"></i> Otwórz raport
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report 2: Order Hours -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">📋 Ilość godzin na zleceniach</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Raport pokazujący łączną liczbę godzin przepracowanych na poszczególnych zleceniach.
+                    </p>
+                    <ul class="small">
+                        <li>Filtrowanie: Rok, Miesiąc, MPK, Firma</li>
+                        <li>Lista zleceń z sumą godzin</li>
+                        <li>Bez mnożników nadgodzin</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="@Url.Action("OrderHours", "Reports")" class="btn btn-success w-100">
+                        <i class="bi bi-clipboard-data"></i> Otwórz raport
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report 3: Vacation Balance -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">🏖️ Bilans dni wolnych</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Raport pokazujący przysługujące, wykorzystane i pozostałe dni urlopu wypoczynkowego.
+                    </p>
+                    <ul class="small">
+                        <li>Filtrowanie: Rok, MPK, Firma</li>
+                        <li>Lista pracowników z bilansem dni</li>
+                        <li>Tylko urlop wypoczynkowy</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="@Url.Action("VacationBalance", "Reports")" class="btn btn-info w-100">
+                        <i class="bi bi-calendar-check"></i> Otwórz raport
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h6><i class="bi bi-info-circle"></i> Informacja</h6>
+                <p class="mb-0">
+                    Wszystkie raporty są dynamiczne i liczą się na żywo z aktualnych danych w bazie danych.
+                    Możesz filtrować dane według różnych kryteriów, aby uzyskać dokładne informacje.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-12">
+            <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Powrót do Dashboard
+            </a>
+        </div>
+    </div>
+</div>

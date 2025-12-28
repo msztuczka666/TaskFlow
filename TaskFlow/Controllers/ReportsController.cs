@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.Data;
 using TaskFlow.Models;
+using TaskFlow.ViewModels;
+using System.Globalization;
 
 namespace TaskFlow.Controllers
 {
@@ -19,6 +21,335 @@ namespace TaskFlow.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        // NEW REPORT 1: Employee Hours Report
+        [HttpGet]
+        public async Task<IActionResult> EmployeeHours()
+        {
+            var model = new EmployeeHoursReportViewModel();
+            
+            // Populate available filter options
+            model.AvailableYears = await _context.EwidencjaCzasu
+                .Select(e => e.Data.Year)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToListAsync();
+                
+            model.AvailableMPKs = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.MPK))
+                .Select(p => p.MPK!)
+                .Distinct()
+                .OrderBy(m => m)
+                .ToListAsync();
+                
+            model.AvailableFirmas = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.Firma))
+                .Select(p => p.Firma!)
+                .Distinct()
+                .OrderBy(f => f)
+                .ToListAsync();
+            
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EmployeeHours(EmployeeHoursReportViewModel model)
+        {
+            // Repopulate filter options
+            model.AvailableYears = await _context.EwidencjaCzasu
+                .Select(e => e.Data.Year)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToListAsync();
+                
+            model.AvailableMPKs = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.MPK))
+                .Select(p => p.MPK!)
+                .Distinct()
+                .OrderBy(m => m)
+                .ToListAsync();
+                
+            model.AvailableFirmas = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.Firma))
+                .Select(p => p.Firma!)
+                .Distinct()
+                .OrderBy(f => f)
+                .ToListAsync();
+
+            // Apply filters
+            var query = _context.EwidencjaCzasu
+                .Include(e => e.Pracownik)
+                .AsQueryable();
+
+            // Filter by years and months
+            if (model.SelectedYears != null && model.SelectedYears.Any())
+            {
+                if (model.SelectedMonths != null && model.SelectedMonths.Any())
+                {
+                    query = query.Where(e => model.SelectedYears.Contains(e.Data.Year) && 
+                                            model.SelectedMonths.Contains(e.Data.Month));
+                }
+                else
+                {
+                    query = query.Where(e => model.SelectedYears.Contains(e.Data.Year));
+                }
+            }
+
+            // Filter by MPK
+            if (model.SelectedMPKs != null && model.SelectedMPKs.Any())
+            {
+                query = query.Where(e => e.Pracownik.MPK != null && model.SelectedMPKs.Contains(e.Pracownik.MPK));
+            }
+
+            // Filter by Firma
+            if (model.SelectedFirmas != null && model.SelectedFirmas.Any())
+            {
+                query = query.Where(e => e.Pracownik.Firma != null && model.SelectedFirmas.Contains(e.Pracownik.Firma));
+            }
+
+            var data = await query
+                .OrderBy(e => e.Pracownik.Nazwisko)
+                .ThenBy(e => e.Pracownik.Imie)
+                .ThenBy(e => e.Data)
+                .ToListAsync();
+
+            // Group by employee and date
+            var grouped = data
+                .GroupBy(e => new { e.PracownikId, e.Pracownik.Imie, e.Pracownik.Nazwisko })
+                .Select(g => new EmployeeHoursRow
+                {
+                    PracownikId = g.Key.PracownikId,
+                    PracownikImie = g.Key.Imie,
+                    PracownikNazwisko = g.Key.Nazwisko,
+                    Days = g.GroupBy(e => e.Data)
+                        .Select(d => new DayHours
+                        {
+                            Date = d.Key,
+                            DayOfWeek = d.Key.ToString("dddd", new CultureInfo("pl-PL")),
+                            Hours = d.Sum(e => e.LiczbaGodzin) // Regular hours only, no overtime multipliers
+                        })
+                        .OrderBy(d => d.Date)
+                        .ToList()
+                })
+                .ToList();
+
+            model.Data = grouped;
+            return View(model);
+        }
+
+        // NEW REPORT 2: Order Hours Report
+        [HttpGet]
+        public async Task<IActionResult> OrderHours()
+        {
+            var model = new OrderHoursReportViewModel();
+            
+            // Populate available filter options
+            model.AvailableYears = await _context.EwidencjaCzasu
+                .Select(e => e.Data.Year)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToListAsync();
+                
+            model.AvailableMPKs = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.MPK))
+                .Select(p => p.MPK!)
+                .Distinct()
+                .OrderBy(m => m)
+                .ToListAsync();
+                
+            model.AvailableFirmas = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.Firma))
+                .Select(p => p.Firma!)
+                .Distinct()
+                .OrderBy(f => f)
+                .ToListAsync();
+            
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> OrderHours(OrderHoursReportViewModel model)
+        {
+            // Repopulate filter options
+            model.AvailableYears = await _context.EwidencjaCzasu
+                .Select(e => e.Data.Year)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToListAsync();
+                
+            model.AvailableMPKs = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.MPK))
+                .Select(p => p.MPK!)
+                .Distinct()
+                .OrderBy(m => m)
+                .ToListAsync();
+                
+            model.AvailableFirmas = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.Firma))
+                .Select(p => p.Firma!)
+                .Distinct()
+                .OrderBy(f => f)
+                .ToListAsync();
+
+            // Apply filters
+            var query = _context.EwidencjaCzasu
+                .Include(e => e.Pracownik)
+                .Include(e => e.Zlecenie)
+                .AsQueryable();
+
+            // Filter by years and months
+            if (model.SelectedYears != null && model.SelectedYears.Any())
+            {
+                if (model.SelectedMonths != null && model.SelectedMonths.Any())
+                {
+                    query = query.Where(e => model.SelectedYears.Contains(e.Data.Year) && 
+                                            model.SelectedMonths.Contains(e.Data.Month));
+                }
+                else
+                {
+                    query = query.Where(e => model.SelectedYears.Contains(e.Data.Year));
+                }
+            }
+
+            // Filter by MPK
+            if (model.SelectedMPKs != null && model.SelectedMPKs.Any())
+            {
+                query = query.Where(e => e.Pracownik.MPK != null && model.SelectedMPKs.Contains(e.Pracownik.MPK));
+            }
+
+            // Filter by Firma
+            if (model.SelectedFirmas != null && model.SelectedFirmas.Any())
+            {
+                query = query.Where(e => e.Pracownik.Firma != null && model.SelectedFirmas.Contains(e.Pracownik.Firma));
+            }
+
+            var data = await query.ToListAsync();
+
+            // Group by order
+            var grouped = data
+                .GroupBy(e => new { e.ZlecenieId, e.Zlecenie.NrZlecenia, e.Zlecenie.OpisZlecenia })
+                .Select(g => new OrderHoursRow
+                {
+                    ZlecenieId = g.Key.ZlecenieId,
+                    NrZlecenia = g.Key.NrZlecenia,
+                    OpisZlecenia = g.Key.OpisZlecenia,
+                    TotalHours = g.Sum(e => e.LiczbaGodzin) // Regular hours only, no overtime multipliers
+                })
+                .OrderBy(o => o.NrZlecenia)
+                .ToList();
+
+            model.Data = grouped;
+            return View(model);
+        }
+
+        // NEW REPORT 3: Vacation Balance Report
+        [HttpGet]
+        public async Task<IActionResult> VacationBalance()
+        {
+            var model = new VacationBalanceReportViewModel();
+            
+            // Populate available filter options
+            model.AvailableYears = Enumerable.Range(DateTime.Now.Year - 5, 11).OrderByDescending(y => y).ToList();
+                
+            model.AvailableMPKs = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.MPK))
+                .Select(p => p.MPK!)
+                .Distinct()
+                .OrderBy(m => m)
+                .ToListAsync();
+                
+            model.AvailableFirmas = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.Firma))
+                .Select(p => p.Firma!)
+                .Distinct()
+                .OrderBy(f => f)
+                .ToListAsync();
+            
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VacationBalance(VacationBalanceReportViewModel model)
+        {
+            // Repopulate filter options
+            model.AvailableYears = Enumerable.Range(DateTime.Now.Year - 5, 11).OrderByDescending(y => y).ToList();
+                
+            model.AvailableMPKs = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.MPK))
+                .Select(p => p.MPK!)
+                .Distinct()
+                .OrderBy(m => m)
+                .ToListAsync();
+                
+            model.AvailableFirmas = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.Firma))
+                .Select(p => p.Firma!)
+                .Distinct()
+                .OrderBy(f => f)
+                .ToListAsync();
+
+            // Apply filters to employees
+            var query = _context.Pracownicy
+                .Where(p => p.StanZatrudnienia == "Zatrudniony")
+                .AsQueryable();
+
+            // Filter by MPK
+            if (model.SelectedMPKs != null && model.SelectedMPKs.Any())
+            {
+                query = query.Where(p => p.MPK != null && model.SelectedMPKs.Contains(p.MPK));
+            }
+
+            // Filter by Firma
+            if (model.SelectedFirmas != null && model.SelectedFirmas.Any())
+            {
+                query = query.Where(p => p.Firma != null && model.SelectedFirmas.Contains(p.Firma));
+            }
+
+            var employees = await query
+                .OrderBy(p => p.Nazwisko)
+                .ThenBy(p => p.Imie)
+                .ToListAsync();
+
+            // Calculate vacation usage for selected years
+            DateTime? startDate = null;
+            DateTime? endDate = null;
+            
+            if (model.SelectedYears != null && model.SelectedYears.Any())
+            {
+                var minYear = model.SelectedYears.Min();
+                var maxYear = model.SelectedYears.Max();
+                startDate = new DateTime(minYear, 1, 1);
+                endDate = new DateTime(maxYear, 12, 31);
+            }
+
+            var data = new List<VacationBalanceRow>();
+
+            foreach (var emp in employees)
+            {
+                // Count vacation days used
+                var vacationQuery = _context.Nieobecnosci
+                    .Where(n => n.PracownikId == emp.Id && n.TypNieobecnosci == "urlop wypoczynkowy");
+
+                if (startDate.HasValue && endDate.HasValue)
+                {
+                    vacationQuery = vacationQuery.Where(n => n.DataOd <= endDate && n.DataDo >= startDate);
+                }
+
+                var vacationDaysUsed = await vacationQuery.SumAsync(n => (int?)n.LiczbaDni) ?? 0;
+
+                data.Add(new VacationBalanceRow
+                {
+                    PracownikId = emp.Id,
+                    PracownikImie = emp.Imie,
+                    PracownikNazwisko = emp.Nazwisko,
+                    LiczbaDniWolnych = emp.LiczbaDniWolnych,
+                    UrlopWykorzystany = vacationDaysUsed
+                });
+            }
+
+            model.Data = data;
+            return View(model);
         }
 
         // Monthly Absence Report

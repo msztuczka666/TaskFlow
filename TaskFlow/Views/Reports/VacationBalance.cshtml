@@ -1,0 +1,178 @@
+@model TaskFlow.ViewModels.VacationBalanceReportViewModel
+@{
+    ViewData["Title"] = "Raport: Bilans dni wolnych";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5">🏖️ Raport: Bilans dni wolnych</h1>
+            <p class="text-muted">Przysługujące, wykorzystane i pozostałe dni urlopu wypoczynkowego</p>
+        </div>
+    </div>
+
+    <form asp-action="VacationBalance" method="post">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-funnel"></i> Filtry</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <!-- Year Filter (Multiple Selection) -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Rok (zaznacz wiele)</label>
+                        <select asp-for="SelectedYears" class="form-select" multiple size="5">
+                            @foreach (var year in Model.AvailableYears)
+                            {
+                                <option value="@year">@year</option>
+                            }
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl/Cmd aby zaznaczyć wiele</small>
+                    </div>
+
+                    <!-- MPK Filter (Multiple Selection) -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">MPK (zaznacz wiele)</label>
+                        <select asp-for="SelectedMPKs" class="form-select" multiple size="5">
+                            @foreach (var mpk in Model.AvailableMPKs)
+                            {
+                                <option value="@mpk">@mpk</option>
+                            }
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl/Cmd aby zaznaczyć wiele</small>
+                    </div>
+
+                    <!-- Firma Filter (Multiple Selection) -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Firma (zaznacz wiele)</label>
+                        <select asp-for="SelectedFirmas" class="form-select" multiple size="5">
+                            @foreach (var firma in Model.AvailableFirmas)
+                            {
+                                <option value="@firma">@firma</option>
+                            }
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl/Cmd aby zaznaczyć wiele</small>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-info">
+                            <i class="bi bi-search"></i> Generuj raport
+                        </button>
+                        <a href="@Url.Action("VacationBalance")" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Wyczyść filtry
+                        </a>
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Powrót do raportów
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    @if (Model.Data != null && Model.Data.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-table"></i> Wyniki raportu</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width: 40%;">Pracownik (Imię i Nazwisko)</th>
+                                <th class="text-center" style="width: 20%;">
+                                    Liczba dni wolnych<br/>
+                                    <small class="text-muted">(przysługujące)</small>
+                                </th>
+                                <th class="text-center" style="width: 20%;">
+                                    Wykorzystane dni<br/>
+                                    <small class="text-muted">(urlop wypoczynkowy)</small>
+                                </th>
+                                <th class="text-center" style="width: 20%;">
+                                    Pozostało dni<br/>
+                                    <small class="text-muted">(urlop wypoczynkowy)</small>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var emp in Model.Data)
+                            {
+                                var badgeClass = emp.UrlopPozostaly > 0 ? "bg-success" : "bg-danger";
+                                <tr>
+                                    <td class="fw-bold">@emp.PracownikPelneImie</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary fs-6">@emp.LiczbaDniWolnych</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-warning text-dark fs-6">@emp.UrlopWykorzystany</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge @badgeClass fs-6">@emp.UrlopPozostaly</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td class="fw-bold">Suma:</td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary fs-5">@Model.Data.Sum(e => e.LiczbaDniWolnych)</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-warning text-dark fs-5">@Model.Data.Sum(e => e.UrlopWykorzystany)</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-dark fs-5">@Model.Data.Sum(e => e.UrlopPozostaly)</span>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle"></i> 
+                    <strong>Znaleziono @Model.Data.Count pracowników</strong> z danymi w wybranym okresie.
+                    Raport pokazuje tylko urlop wypoczynkowy.
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <h6 class="card-title">Łącznie przysługujące</h6>
+                                <h3 class="text-primary">@Model.Data.Sum(e => e.LiczbaDniWolnych) dni</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-warning">
+                            <div class="card-body text-center">
+                                <h6 class="card-title">Łącznie wykorzystane</h6>
+                                <h3 class="text-warning">@Model.Data.Sum(e => e.UrlopWykorzystany) dni</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <h6 class="card-title">Łącznie pozostało</h6>
+                                <h3 class="text-success">@Model.Data.Sum(e => e.UrlopPozostaly) dni</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (Model.SelectedYears != null && Model.SelectedYears.Any())
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i> 
+            Brak danych dla wybranych filtrów. Spróbuj zmienić kryteria wyszukiwania.
+        </div>
+    }
+</div>

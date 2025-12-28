@@ -1,0 +1,149 @@
+@model TaskFlow.ViewModels.OrderHoursReportViewModel
+@{
+    ViewData["Title"] = "Raport: Ilość godzin na zleceniach";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5">📋 Raport: Ilość godzin na zleceniach</h1>
+            <p class="text-muted">Suma godzin przepracowanych na zleceniach (bez mnożników nadgodzin)</p>
+        </div>
+    </div>
+
+    <form asp-action="OrderHours" method="post">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-funnel"></i> Filtry</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <!-- Year Filter (Multiple Selection) -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Rok (zaznacz wiele)</label>
+                        <select asp-for="SelectedYears" class="form-select" multiple size="5">
+                            @foreach (var year in Model.AvailableYears)
+                            {
+                                <option value="@year">@year</option>
+                            }
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl/Cmd aby zaznaczyć wiele</small>
+                    </div>
+
+                    <!-- Month Filter (Multiple Selection) -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Miesiąc (zaznacz wiele)</label>
+                        <select asp-for="SelectedMonths" class="form-select" multiple size="5">
+                            <option value="1">Styczeń</option>
+                            <option value="2">Luty</option>
+                            <option value="3">Marzec</option>
+                            <option value="4">Kwiecień</option>
+                            <option value="5">Maj</option>
+                            <option value="6">Czerwiec</option>
+                            <option value="7">Lipiec</option>
+                            <option value="8">Sierpień</option>
+                            <option value="9">Wrzesień</option>
+                            <option value="10">Październik</option>
+                            <option value="11">Listopad</option>
+                            <option value="12">Grudzień</option>
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl/Cmd aby zaznaczyć wiele</small>
+                    </div>
+
+                    <!-- MPK Filter (Multiple Selection) -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">MPK (zaznacz wiele)</label>
+                        <select asp-for="SelectedMPKs" class="form-select" multiple size="5">
+                            @foreach (var mpk in Model.AvailableMPKs)
+                            {
+                                <option value="@mpk">@mpk</option>
+                            }
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl/Cmd aby zaznaczyć wiele</small>
+                    </div>
+
+                    <!-- Firma Filter (Multiple Selection) -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Firma (zaznacz wiele)</label>
+                        <select asp-for="SelectedFirmas" class="form-select" multiple size="5">
+                            @foreach (var firma in Model.AvailableFirmas)
+                            {
+                                <option value="@firma">@firma</option>
+                            }
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl/Cmd aby zaznaczyć wiele</small>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-search"></i> Generuj raport
+                        </button>
+                        <a href="@Url.Action("OrderHours")" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Wyczyść filtry
+                        </a>
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Powrót do raportów
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    @if (Model.Data != null && Model.Data.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-table"></i> Wyniki raportu</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width: 15%;">Nr zlecenia</th>
+                                <th style="width: 60%;">Opis zlecenia</th>
+                                <th class="text-end" style="width: 25%;">Suma godzin (bez nadgodzin)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model.Data)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@order.NrZlecenia</td>
+                                    <td>@order.OpisZlecenia</td>
+                                    <td class="text-end">
+                                        <span class="badge bg-primary fs-6">@order.TotalHours.ToString("F2") h</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="2" class="fw-bold text-end">Łączna suma godzin:</td>
+                                <td class="text-end">
+                                    <span class="badge bg-dark fs-5">@Model.Data.Sum(o => o.TotalHours).ToString("F2") h</span>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle"></i> 
+                    <strong>Znaleziono @Model.Data.Count zleceń</strong> z danymi w wybranym okresie.
+                    Godziny pokazane są bez mnożników nadgodzin (rzeczywiste godziny pracy).
+                </div>
+            </div>
+        </div>
+    }
+    else if (Model.SelectedYears != null && Model.SelectedYears.Any())
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i> 
+            Brak danych dla wybranych filtrów. Spróbuj zmienić kryteria wyszukiwania.
+        </div>
+    }
+</div>

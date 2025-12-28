@@ -39,15 +39,8 @@
                         </li>
                         @if (User.IsInRole("Admin") || User.IsInRole("Kierownik"))
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    📈 Raporty
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
-                                    <li><a class="dropdown-item" asp-controller="Reports" asp-action="MonthlyAbsences">Nieobecności miesięczne</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Reports" asp-action="SEPExpiryWarnings">Ostrzeżenia SEP</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Reports" asp-action="AbsenceSummaryByType">Podsumowanie wg typu</a></li>
-                                </ul>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")" asp-area="" asp-controller="Reports" asp-action="Index">📊 Raporty</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Import" ? "active" : "")" asp-area="" asp-controller="Import" asp-action="Index">⬇️ Import</a>

@@ -10,15 +10,15 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
-                <label asp-for="PracownikId" class="form-label">Pracownik</label>
-                <select asp-for="PracownikId" class="form-select" asp-items="@(ViewData["PracownikId"] as SelectList)">
+                <label asp-for="PracownikId" class="form-label">Pracownik <span class="text-danger">*</span></label>
+                <select asp-for="PracownikId" class="form-select" asp-items="@(ViewData["PracownikId"] as SelectList)" required>
                     <option value="">-- Wybierz pracownika --</option>
                 </select>
                 <span asp-validation-for="PracownikId" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label asp-for="TypNieobecnosci" class="form-label">Typ nieobecności</label>
-                <select asp-for="TypNieobecnosci" class="form-select">
+                <label asp-for="TypNieobecnosci" class="form-label">Typ nieobecności <span class="text-danger">*</span></label>
+                <select asp-for="TypNieobecnosci" class="form-select" required>
                     <option value="">-- Wybierz typ nieobecności --</option>
                     @foreach (var typ in (List<string>)ViewData["TypyNieobecnosci"])
                     {
@@ -28,13 +28,13 @@
                 <span asp-validation-for="TypNieobecnosci" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label asp-for="DataOd" class="form-label"></label>
-                <input asp-for="DataOd" class="form-control" type="date" />
+                <label asp-for="DataOd" class="form-label">Data od <span class="text-danger">*</span></label>
+                <input asp-for="DataOd" class="form-control" type="date" required />
                 <span asp-validation-for="DataOd" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label asp-for="DataDo" class="form-label"></label>
-                <input asp-for="DataDo" class="form-control" type="date" />
+                <label asp-for="DataDo" class="form-label">Data do <span class="text-danger">*</span></label>
+                <input asp-for="DataDo" class="form-control" type="date" required />
                 <span asp-validation-for="DataDo" class="text-danger"></span>
             </div>
             <div class="mb-3">

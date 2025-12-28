@@ -6,31 +6,35 @@ namespace TaskFlow.Models
     {
         public int Id { get; set; }
 
-        [StringLength(200)]
+        [Required(ErrorMessage = "Nr zlecenia jest wymagany")]
+        [StringLength(30, ErrorMessage = "Nr zlecenia nie może przekraczać 30 znaków")]
         [Display(Name = "Nr zlecenia")]
-        public string? NrZlecenia { get; set; }
+        public string NrZlecenia { get; set; } = string.Empty;
 
-        [Required]
-        [StringLength(1000)]
+        [Required(ErrorMessage = "Opis zlecenia jest wymagany")]
+        [StringLength(110, ErrorMessage = "Opis zlecenia nie może przekraczać 110 znaków")]
         [Display(Name = "Opis zlecenia")]
         public string Opis { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = "Data rozpoczęcia jest wymagana")]
         [Display(Name = "Data rozpoczęcia")]
+        [DataType(DataType.Date)]
         public DateTime DataRozpoczecia { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Data zakończenia jest wymagana")]
         [Display(Name = "Data zakończenia")]
+        [DataType(DataType.Date)]
         public DateTime DataZakonczenia { get; set; }
 
-        [Display(Name = "Ilość dni roboczych")]
+        [Display(Name = "Ilość dni")]
         public int LiczbaDniRoboczych { get; set; }
 
-        [StringLength(100)]
+        [Required(ErrorMessage = "Status jest wymagany")]
+        [StringLength(20)]
         [Display(Name = "Status")]
-        public string? Status { get; set; }
+        public string Status { get; set; } = "Aktywne";
 
-        [StringLength(1000)]
+        [StringLength(110, ErrorMessage = "Informacje nie mogą przekraczać 110 znaków")]
         [Display(Name = "Informacje")]
         public string? Informacje { get; set; }
 

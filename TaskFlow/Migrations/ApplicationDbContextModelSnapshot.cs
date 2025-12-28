@@ -400,23 +400,25 @@ namespace TaskFlow.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Informacje")
-                        .HasMaxLength(1000)
+                        .HasMaxLength(110)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("LiczbaDniRoboczych")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("NrZlecenia")
-                        .HasMaxLength(200)
+                        .IsRequired()
+                        .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Opis")
                         .IsRequired()
-                        .HasMaxLength(1000)
+                        .HasMaxLength(110)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
-                        .HasMaxLength(100)
+                        .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

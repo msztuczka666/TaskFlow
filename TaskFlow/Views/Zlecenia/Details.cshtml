@@ -1,0 +1,98 @@
+@model TaskFlow.Models.Zlecenie
+@{
+    ViewData["Title"] = "Szczegóły zlecenia";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.NrZlecenia)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.NrZlecenia)
+            </dd>
+
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.Opis)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Opis)
+            </dd>
+
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.DataRozpoczecia)
+            </dt>
+            <dd class="col-sm-9">
+                @Model.DataRozpoczecia.ToString("dd.MM.yyyy")
+            </dd>
+
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.DataZakonczenia)
+            </dt>
+            <dd class="col-sm-9">
+                @Model.DataZakonczenia.ToString("dd.MM.yyyy")
+            </dd>
+
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.LiczbaDniRoboczych)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.LiczbaDniRoboczych) dni
+            </dd>
+
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.Status)
+            </dt>
+            <dd class="col-sm-9">
+                @if (Model.Status == "Aktywne")
+                {
+                    <span class="badge bg-success">Aktywne</span>
+                }
+                else if (Model.Status == "Zakończone")
+                {
+                    <span class="badge bg-secondary">Zakończone</span>
+                }
+                else
+                {
+                    <span class="badge bg-info">@Model.Status</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.Informacje)
+            </dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrEmpty(Model.Informacje))
+                {
+                    @Html.DisplayFor(model => model.Informacje)
+                }
+                else
+                {
+                    <span class="text-muted">Brak dodatkowych informacji</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">
+                Data utworzenia
+            </dt>
+            <dd class="col-sm-9">
+                @Model.DataUtworzenia.ToString("dd.MM.yyyy HH:mm")
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-3">
+    @if (User.IsInRole("Admin") || User.IsInRole("Kierownik") || User.IsInRole("Specjalista"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edycja</a>
+    }
+    @if (User.IsInRole("Admin") || User.IsInRole("Kierownik"))
+    {
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Usuń</a>
+    }
+    <a asp-action="Index" class="btn btn-secondary">Powrót do listy</a>
+</div>

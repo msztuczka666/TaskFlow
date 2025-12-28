@@ -19,10 +19,9 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Nazwa</th>
-                        <th>Data rozpoczęcia</th>
-                        <th>Data zakończenia</th>
-                        <th>Dni robocze</th>
+                        <th>Nr zlecenia</th>
+                        <th>Opis zlecenia</th>
+                        <th>Ilość dni</th>
                         <th>Status</th>
                         <th>Akcje</th>
                     </tr>
@@ -32,27 +31,20 @@
                     {
                         <tr>
                             <td>@item.NrZlecenia</td>
-                            <td>@item.DataRozpoczecia.ToString("dd.MM.yyyy")</td>
-                            <td>@item.DataZakonczenia.ToString("dd.MM.yyyy")</td>
+                            <td>@item.Opis</td>
                             <td>@item.LiczbaDniRoboczych</td>
                             <td>
-                                @switch (item.Status)
+                                @if (item.Status == "Aktywne")
                                 {
-                                    case "Nowe":
-                                        <span class="badge bg-info">@item.Status</span>
-                                        break;
-                                    case "W trakcie":
-                                        <span class="badge bg-primary">@item.Status</span>
-                                        break;
-                                    case "Zakończone":
-                                        <span class="badge bg-success">@item.Status</span>
-                                        break;
-                                    case "Wstrzymane":
-                                        <span class="badge bg-warning text-dark">@item.Status</span>
-                                        break;
-                                    default:
-                                        <span class="badge bg-secondary">@item.Status</span>
-                                        break;
+                                    <span class="badge bg-success">Aktywne</span>
+                                }
+                                else if (item.Status == "Zakończone")
+                                {
+                                    <span class="badge bg-secondary">Zakończone</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info">@item.Status</span>
                                 }
                             </td>
                             <td>
@@ -60,7 +52,7 @@
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Szczegóły</a>
                                     @if (User.IsInRole("Admin") || User.IsInRole("Kierownik") || User.IsInRole("Specjalista"))
                                     {
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edytuj</a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edycja</a>
                                     }
                                     @if (User.IsInRole("Admin") || User.IsInRole("Kierownik"))
                                     {

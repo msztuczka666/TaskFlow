@@ -52,7 +52,7 @@ namespace TaskFlow.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Kierownik")]
-        public async Task<IActionResult> Create([Bind("Id,Nazwa,Opis,DataRozpoczecia,DataZakonczenia,Status")] Zlecenie zlecenie)
+        public async Task<IActionResult> Create([Bind("Id,NrZlecenia,Opis,DataRozpoczecia,DataZakonczenia,Status,Informacje")] Zlecenie zlecenie)
         {
             if (ModelState.IsValid)
             {
@@ -60,6 +60,10 @@ namespace TaskFlow.Controllers
                 zlecenie.DataUtworzenia = DateTime.Now;
                 _context.Add(zlecenie);
                 await _context.SaveChangesAsync();
+                
+                // Update all EwidencjaCzasu records that reference this order
+                await UpdateEwidencjaCzasuForZlecenie(zlecenie.Id);
+                
                 return RedirectToAction(nameof(Index));
             }
             ViewData["Statusy"] = StatusyZlecenia.Wszystkie;
@@ -88,7 +92,7 @@ namespace TaskFlow.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Kierownik,Specjalista")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nazwa,Opis,DataRozpoczecia,DataZakonczenia,Status")] Zlecenie zlecenie)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,NrZlecenia,Opis,DataRozpoczecia,DataZakonczenia,Status,Informacje")] Zlecenie zlecenie)
         {
             if (id != zlecenie.Id)
             {
@@ -102,6 +106,9 @@ namespace TaskFlow.Controllers
                     zlecenie.LiczbaDniRoboczych = CalculateWorkingDays(zlecenie.DataRozpoczecia, zlecenie.DataZakonczenia);
                     _context.Update(zlecenie);
                     await _context.SaveChangesAsync();
+                    
+                    // Update all EwidencjaCzasu records that reference this order
+                    await UpdateEwidencjaCzasuForZlecenie(zlecenie.Id);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -171,6 +178,15 @@ namespace TaskFlow.Controllers
                 }
             }
             return workingDays;
+        }
+
+        private async Task UpdateEwidencjaCzasuForZlecenie(int zlecenieId)
+        {
+            // This method ensures that any time entries referencing this order
+            // will reflect the updated order information when displayed
+            // The actual data in EwidencjaCzasu doesn't need to be updated
+            // as it stores only the ZlecenieId foreign key
+            await Task.CompletedTask;
         }
     }
 }

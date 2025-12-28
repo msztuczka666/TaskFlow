@@ -69,10 +69,7 @@
     <!-- FOOTER -->
     <div class="footer">
         <div class="footer-left">
-            Ostatnia zmiana: <strong>@DateTime.Now.ToString("dd.MM.yyyy HH:mm")</strong> • @User.Identity.Name
-        </div>
-        <div class="footer-center">
-            © 2025 - TaskFlow - Synthraxis - Mariusz Sztuczka
+            Ostatnia zmiana: <strong>@DateTime.Now.ToString("dd.MM.yyyy HH:mm")</strong> - @User.Identity.Name
         </div>
         <div class="footer-right">
             <button class="btn-cancel" onclick="cancelChanges()">Anuluj</button>
@@ -155,12 +152,14 @@
                     opisPrac: e.OpisPrac || ''
                 }));
                 entryIdCounter = Math.max(...entries.map(e => e.id)) + 1;
+                renderEntries();
+                updateStatistics();
             } else {
-                // Add one empty entry
-                addEntry();
+                // Start with empty day (no entries)
+                entries = [];
+                renderEntries();
+                updateStatistics();
             }
-            renderEntries();
-            updateStatistics();
         }
 
         // Add new entry
@@ -242,9 +241,19 @@
             entries.forEach((entry, index) => {
                 const hours = calculateHours(entry.godzinaOd, entry.godzinaDo);
                 const isOvertime = hours.overtime > 0;
+                const totalHours = hours.total;
+                
+                // Determine row highlighting class based on hours worked
+                let rowClass = 'entry-row';
+                if (totalHours < 8) {
+                    rowClass += ' hours-under-8';  // Orange
+                } else if (totalHours > 8) {
+                    rowClass += ' hours-over-8';   // Red
+                }
+                // If exactly 8 hours, no special class (normal)
 
                 const entryDiv = document.createElement('div');
-                entryDiv.className = 'entry-row' + (isOvertime ? ' has-overtime' : '');
+                entryDiv.className = rowClass;
                 entryDiv.innerHTML = `
                     <div class="form-group">
                         <label>Pracownik</label>

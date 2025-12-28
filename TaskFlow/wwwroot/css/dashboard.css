@@ -247,6 +247,28 @@ body {
     transform: translateX(4px);
 }
 
+/* Hours highlighting - less than 8 hours */
+.entry-row.hours-under-8 {
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.entry-row.hours-under-8:hover {
+    background: rgba(245, 158, 11, 0.18);
+    border-color: rgba(245, 158, 11, 0.5);
+}
+
+/* Hours highlighting - more than 8 hours */
+.entry-row.hours-over-8 {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.entry-row.hours-over-8:hover {
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
 .entry-row.has-overtime {
     background: rgba(245, 158, 11, 0.08);
     border: 1px solid rgba(245, 158, 11, 0.25);
@@ -386,13 +408,6 @@ body {
 
 .footer-left strong {
     color: #cbd5e1;
-}
-
-.footer-center {
-    font-size: 11px;
-    color: #64748b;
-    font-weight: 600;
-    letter-spacing: 0.5px;
 }
 
 .footer-right {

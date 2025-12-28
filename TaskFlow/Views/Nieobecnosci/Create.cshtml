@@ -11,7 +11,9 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
                 <label asp-for="PracownikId" class="form-label">Pracownik</label>
-                <select asp-for="PracownikId" class="form-select" asp-items="ViewBag.PracownikId"></select>
+                <select asp-for="PracownikId" class="form-select" asp-items="@(ViewData["PracownikId"] as SelectList)">
+                    <option value="">-- Wybierz pracownika --</option>
+                </select>
                 <span asp-validation-for="PracownikId" class="text-danger"></span>
             </div>
             <div class="mb-3">

@@ -10,6 +10,10 @@ namespace TaskFlow.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Update NULL values before changing column constraints
+            migrationBuilder.Sql("UPDATE Zlecenia SET NrZlecenia = 'Brak' WHERE NrZlecenia IS NULL");
+            migrationBuilder.Sql("UPDATE Zlecenia SET Status = 'Aktywne' WHERE Status IS NULL");
+            
             migrationBuilder.AlterColumn<string>(
                 name: "NrZlecenia",
                 table: "Zlecenia",
@@ -37,7 +41,7 @@ namespace TaskFlow.Migrations
                 type: "TEXT",
                 maxLength: 20,
                 nullable: false,
-                defaultValue: "",
+                defaultValue: "Aktywne",
                 oldClrType: typeof(string),
                 oldType: "TEXT",
                 oldMaxLength: 100,

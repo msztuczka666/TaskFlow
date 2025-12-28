@@ -24,11 +24,7 @@
                         <th>Firma</th>
                         <th>Nr przepustki</th>
                         <th>MPK</th>
-                        <th>Firma ID</th>
-                        <th>Stanowisko</th>
-                        <th>SEP nr</th>
-                        <th>SEP ważne do</th>
-                        <th>Status SEP</th>
+                        <th>Firma Id</th>
                         <th>Akcje</th>
                     </tr>
                 </thead>
@@ -38,40 +34,16 @@
                         <tr>
                             <td>@item.Imie</td>
                             <td>@item.Nazwisko</td>
-                            <td>@item.Firma</td>
-                            <td>@item.NrPrzepustki</td>
-                            <td>@item.MPK</td>
-                            <td>@item.FirmaId</td>
-                            <td>@item.Stanowisko</td>
-                            <td>@item.SEPNr</td>
-                            <td>@(item.DataWaznosciSEP?.ToString("dd.MM.yyyy") ?? "-")</td>
-                            <td>
-                                @if (item.DataWaznosciSEP.HasValue)
-                                {
-                                    if (item.CzySEPWazny)
-                                    {
-                                        <span class="badge bg-success">Ważny</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger">Wygasł</span>
-                                    }
-                                    @if (item.DniDoWygasniecia >= 0 && item.DniDoWygasniecia <= 30)
-                                    {
-                                        <span class="badge bg-warning text-dark">@item.DniDoWygasniecia dni</span>
-                                    }
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Brak danych</span>
-                                }
-                            </td>
+                            <td>@(item.Firma ?? "-")</td>
+                            <td>@(item.NrPrzepustki ?? "-")</td>
+                            <td>@(item.MPK ?? "-")</td>
+                            <td>@(item.FirmaId ?? "-")</td>
                             <td>
                                 <div class="btn-group" role="group">
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Szczegóły</a>
                                     @if (User.IsInRole("Admin") || User.IsInRole("Kierownik"))
                                     {
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edytuj</a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edycja</a>
                                     }
                                     @if (User.IsInRole("Admin"))
                                     {

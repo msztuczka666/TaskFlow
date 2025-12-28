@@ -55,7 +55,7 @@ namespace TaskFlow.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Kierownik")]
-        public async Task<IActionResult> Create([Bind("Id,Imie,Nazwisko,FirmaGlowna,FirmaIdentyfikatorowa,DataWaznosciSEP")] Pracownik pracownik)
+        public async Task<IActionResult> Create([Bind("Id,Imie,Nazwisko,Firma,NrPrzepustki,MPK,FirmaId,Stanowisko,SEPNr,DataWaznosciSEP,SEPNapiecie,LiczbaDniWolnych,LiczbaDniNaZeszycie,LiczbaDniWykorzystanych,LiczbaDniNaZadanie,TypPracownika,StawkaZlH,Informacje")] Pracownik pracownik)
         {
             if (ModelState.IsValid)
             {
@@ -87,7 +87,7 @@ namespace TaskFlow.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Kierownik")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Imie,Nazwisko,FirmaGlowna,FirmaIdentyfikatorowa,DataWaznosciSEP")] Pracownik pracownik)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Imie,Nazwisko,Firma,NrPrzepustki,MPK,FirmaId,Stanowisko,SEPNr,DataWaznosciSEP,SEPNapiecie,LiczbaDniWolnych,LiczbaDniNaZeszycie,LiczbaDniWykorzystanych,LiczbaDniNaZadanie,TypPracownika,StawkaZlH,Informacje")] Pracownik pracownik)
         {
             if (id != pracownik.Id)
             {

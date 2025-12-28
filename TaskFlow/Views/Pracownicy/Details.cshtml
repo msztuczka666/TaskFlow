@@ -1,0 +1,87 @@
+@model TaskFlow.Models.Pracownik
+@{
+    ViewData["Title"] = "Szczegóły pracownika";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="card">
+    <div class="card-header">
+        <h4>@Model.Imie @Model.Nazwisko</h4>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Imie)</dt>
+            <dd class="col-sm-9">@Model.Imie</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Nazwisko)</dt>
+            <dd class="col-sm-9">@Model.Nazwisko</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Firma)</dt>
+            <dd class="col-sm-9">@(Model.Firma ?? "-")</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.NrPrzepustki)</dt>
+            <dd class="col-sm-9">@(Model.NrPrzepustki ?? "-")</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.MPK)</dt>
+            <dd class="col-sm-9">@(Model.MPK ?? "-")</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FirmaId)</dt>
+            <dd class="col-sm-9">@(Model.FirmaId ?? "-")</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Stanowisko)</dt>
+            <dd class="col-sm-9">@(Model.Stanowisko ?? "-")</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.SEPNr)</dt>
+            <dd class="col-sm-9">@(Model.SEPNr ?? "-")</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.DataWaznosciSEP)</dt>
+            <dd class="col-sm-9">@(Model.DataWaznosciSEP?.ToString("dd.MM.yyyy") ?? "-")</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.SEPNapiecie)</dt>
+            <dd class="col-sm-9">@(Model.SEPNapiecie ?? "-")</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.LiczbaDniWolnych)</dt>
+            <dd class="col-sm-9">@Model.LiczbaDniWolnych dni</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.LiczbaDniNaZeszycie)</dt>
+            <dd class="col-sm-9">@Model.LiczbaDniNaZeszycie dni</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.LiczbaDniWykorzystanych)</dt>
+            <dd class="col-sm-9">@Model.LiczbaDniWykorzystanych dni</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.LiczbaDniNaZadanie)</dt>
+            <dd class="col-sm-9">@Model.LiczbaDniNaZadanie dni (max 4 w roku)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.TypPracownika)</dt>
+            <dd class="col-sm-9">
+                @if (Model.TypPracownika == "Nadzór")
+                {
+                    <span class="badge bg-primary">@Model.TypPracownika</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">@Model.TypPracownika</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.StawkaZlH)</dt>
+            <dd class="col-sm-9">@(Model.StawkaZlH?.ToString("F2") ?? "-") PLN/h</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Informacje)</dt>
+            <dd class="col-sm-9">@(Model.Informacje ?? "-")</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-3">
+    @if (User.IsInRole("Admin") || User.IsInRole("Kierownik"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edycja</a>
+    }
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Usuń</a>
+    }
+    <a asp-action="Index" class="btn btn-secondary">Powrót do listy</a>
+</div>

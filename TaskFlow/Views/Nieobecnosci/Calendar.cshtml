@@ -46,24 +46,44 @@
         </div>
 
         <div class="mt-4">
-            <h5>Legenda</h5>
+            <h5>Legenda typów nieobecności</h5>
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-3 mb-2">
                     <span class="badge bg-primary">urlop wypoczynkowy</span>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 mb-2">
                     <span class="badge bg-danger">zwolnienie lekarskie</span>
                 </div>
-                <div class="col-md-3">
-                    <span class="badge bg-warning">urlop na żądanie</span>
+                <div class="col-md-3 mb-2">
+                    <span class="badge bg-warning text-dark">urlop na żądanie</span>
                 </div>
-                <div class="col-md-3">
-                    <span class="badge bg-info">szkolenie</span>
+                <div class="col-md-3 mb-2">
+                    <span class="badge bg-secondary">urlop zeszyt</span>
                 </div>
             </div>
-            <div class="row mt-2">
-                <div class="col-md-3">
-                    <span class="badge bg-secondary">inne</span>
+            <div class="row">
+                <div class="col-md-3 mb-2">
+                    <span class="badge bg-info text-dark">szkolenie bhp</span>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <span class="badge bg-success">badania okresowe</span>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <span class="badge bg-light text-dark border">urlop okolicznościowy</span>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <span class="badge bg-dark">opiekuńcze</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 mb-2">
+                    <span class="badge bg-info text-dark">szkolenie</span>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <span class="badge bg-danger">oddanie krwi</span>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <span class="badge bg-warning text-dark">nieobecność nieusprawiedliwiona</span>
                 </div>
             </div>
         </div>
@@ -84,10 +104,17 @@
     })));
 
     function getAbsenceBadgeClass(typ) {
-        if (typ.includes('urlop wypoczynkowy')) return 'bg-primary';
-        if (typ.includes('zwolnienie')) return 'bg-danger';
-        if (typ.includes('żądanie')) return 'bg-warning';
-        if (typ.includes('szkolenie')) return 'bg-info';
+        if (typ === 'urlop wypoczynkowy') return 'bg-primary';
+        if (typ === 'zwolnienie lekarskie') return 'bg-danger';
+        if (typ === 'urlop na żądanie') return 'bg-warning';
+        if (typ === 'urlop zeszyt') return 'bg-secondary';
+        if (typ === 'szkolenie bhp') return 'bg-info';
+        if (typ === 'badania okresowe') return 'bg-success';
+        if (typ === 'urlop okolicznościowy') return 'bg-light text-dark border';
+        if (typ === 'opiekuńcze') return 'bg-dark';
+        if (typ === 'szkolenie') return 'bg-info';
+        if (typ === 'oddanie krwi') return 'bg-danger';
+        if (typ === 'nieobecność nieusprawiedliwiona') return 'bg-warning';
         return 'bg-secondary';
     }
 

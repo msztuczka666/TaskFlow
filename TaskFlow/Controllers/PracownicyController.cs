@@ -55,10 +55,15 @@ namespace TaskFlow.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Kierownik")]
-        public async Task<IActionResult> Create([Bind("Id,Imie,Nazwisko,Firma,NrPrzepustki,MPK,FirmaId,Stanowisko,SEPNr,DataWaznosciSEP,SEPNapiecie,LiczbaDniWolnych,LiczbaDniNaZeszycie,LiczbaDniWykorzystanych,LiczbaDniNaZadanie,TypPracownika,StawkaZlH,Informacje")] Pracownik pracownik)
+        public async Task<IActionResult> Create([Bind("Id,Imie,Nazwisko,Firma,NrPrzepustki,MPK,FirmaId,Stanowisko,SEPNr,DataWaznosciSEP,SEPNapiecie,LiczbaDniWolnych,LiczbaDniNaZeszycie,LiczbaDniWykorzystanych,LiczbaDniNaZadanie,TypPracownika,StawkaZlH,StanZatrudnienia,Informacje")] Pracownik pracownik)
         {
             if (ModelState.IsValid)
             {
+                // Set default value if not provided
+                if (string.IsNullOrEmpty(pracownik.StanZatrudnienia))
+                {
+                    pracownik.StanZatrudnienia = "Zatrudniony";
+                }
                 _context.Add(pracownik);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -87,7 +92,7 @@ namespace TaskFlow.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Kierownik")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Imie,Nazwisko,Firma,NrPrzepustki,MPK,FirmaId,Stanowisko,SEPNr,DataWaznosciSEP,SEPNapiecie,LiczbaDniWolnych,LiczbaDniNaZeszycie,LiczbaDniWykorzystanych,LiczbaDniNaZadanie,TypPracownika,StawkaZlH,Informacje")] Pracownik pracownik)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Imie,Nazwisko,Firma,NrPrzepustki,MPK,FirmaId,Stanowisko,SEPNr,DataWaznosciSEP,SEPNapiecie,LiczbaDniWolnych,LiczbaDniNaZeszycie,LiczbaDniWykorzystanych,LiczbaDniNaZadanie,TypPracownika,StawkaZlH,StanZatrudnienia,Informacje")] Pracownik pracownik)
         {
             if (id != pracownik.Id)
             {

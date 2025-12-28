@@ -38,53 +38,60 @@ namespace TaskFlow.Models
 
     public static class TypyNieobecnosci
     {
-        public const string SzkolenieBHP = "Szkolenie BHP";
-        public const string BadaniaOkresowe = "Badania okresowe";
-        public const string UrlopWypoczynkowy = "Urlop wypoczynkowy";
-        public const string UrlopNaZadanie = "Urlop na żądanie";
-        public const string UrlopOkolicznosciowy = "Urlop okolicznościowy";
-        public const string UrlopZeszyt = "Urlop zeszyt";
-        public const string ZwolnienieLekarskie = "Zwolnienie lekarskie";
-        public const string Opiekunczy = "Opiekuńcze";
-        public const string Szkolenie = "Szkolenie";
-        public const string OddanieKrwi = "Oddanie krwi";
-        public const string NieobecnoscNieusprawiedliwiona = "Nieobecność nieusprawiedliwiona";
+        // Typ nieobecności constants
+        public const string UrlopWypoczynkowy = "urlop wypoczynkowy";
+        public const string ZwolnienieLekarskie = "zwolnienie lekarskie";
+        public const string UrlopNaZadanie = "urlop na żądanie";
+        public const string UrlopZeszyt = "urlop zeszyt";
+        public const string SzkolenieBHP = "szkolenie bhp";
+        public const string BadaniaOkresowe = "badania okresowe";
+        public const string UrlopOkolicznosciowy = "urlop okolicznościowy";
+        public const string Opiekunczy = "opiekuńcze";
+        public const string Szkolenie = "szkolenie";
+        public const string OddanieKrwi = "oddanie krwi";
+        public const string NieobecnoscNieusprawiedliwiona = "nieobecność nieusprawiedliwiona";
 
-        // Typy które liczą 8 godzin
+        // Typy które liczą 8 godzin (traktowane jako zlecenie)
         public static readonly HashSet<string> TypyZ8Godzinami = new()
         {
             SzkolenieBHP,
             BadaniaOkresowe,
-            Szkolenie
+            Szkolenie,
+            OddanieKrwi  // Oddanie krwi też liczy 8 godzin
         };
 
-        // Typy które nie liczą godzin
+        // Typy które nie liczą godzin na zleceniach
         public static readonly HashSet<string> TypyBezGodzin = new()
         {
             UrlopWypoczynkowy,
+            ZwolnienieLekarskie,
             UrlopNaZadanie,
-            UrlopOkolicznosciowy,
             UrlopZeszyt,
+            UrlopOkolicznosciowy,
             Opiekunczy,
-            OddanieKrwi,
             NieobecnoscNieusprawiedliwiona
         };
 
-        // Oddanie krwi daje dodatkowy wolny dzień
+        // Oddanie krwi daje dodatkowy wolny dzień (w sumie 2 dni: dzień oddania + kolejny dzień roboczy)
+        // Zasada: Dni wolne muszą następować bezpośrednio po sobie
         public static readonly Dictionary<string, int> DomyslneLimitDni = new()
         {
             { OddanieKrwi, 2 }
         };
 
+        // Urlop na żądanie - max 4 dni w roku
+        public const int MaxUrlopNaZadanie = 4;
+
+        // Lista wszystkich typów w kolejności zgodnej z wymaganiami użytkownika
         public static List<string> Wszystkie => new()
         {
+            UrlopWypoczynkowy,
+            ZwolnienieLekarskie,
+            UrlopNaZadanie,
+            UrlopZeszyt,
             SzkolenieBHP,
             BadaniaOkresowe,
-            UrlopWypoczynkowy,
-            UrlopNaZadanie,
             UrlopOkolicznosciowy,
-            UrlopZeszyt,
-            ZwolnienieLekarskie,
             Opiekunczy,
             Szkolenie,
             OddanieKrwi,
@@ -95,16 +102,18 @@ namespace TaskFlow.Models
         {
             if (TypyZ8Godzinami.Contains(typNieobecnosci))
             {
+                // Typy traktowane jako zlecenie - liczą 8 godzin dziennie
                 return liczbaDni * 8;
             }
             else if (TypyBezGodzin.Contains(typNieobecnosci))
             {
-                return null; // Nie liczone
+                // Typy które nie liczą godzin
+                return null;
             }
             else
             {
-                // Domyślnie dla innych typów (np. zwolnienie lekarskie)
-                return liczbaDni * 8;
+                // Domyślnie nie liczone
+                return null;
             }
         }
     }

@@ -1,0 +1,169 @@
+@model IEnumerable<TaskFlow.Models.Nieobecnosc>
+@{
+    ViewData["Title"] = "Kalendarz nieobecności";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>@ViewData["Title"]</h1>
+    <div>
+        <a asp-action="Index" class="btn btn-secondary me-2">
+            <i class="bi bi-list"></i> Lista
+        </a>
+        @if (User.IsInRole("Admin") || User.IsInRole("Kierownik") || User.IsInRole("Specjalista"))
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Dodaj nieobecność
+            </a>
+        }
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="employeeFilter" class="form-label">Wybierz pracownika</label>
+                <select id="employeeFilter" class="form-select">
+                    <option value="">Wszyscy pracownicy</option>
+                    @foreach (var employee in Model.Select(n => n.Pracownik).DistinctBy(p => p.Id).OrderBy(p => p.Imie).ThenBy(p => p.Nazwisko))
+                    {
+                        <option value="@employee.Id">@employee.Imie @employee.Nazwisko</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="monthFilter" class="form-label">Miesiąc</label>
+                <input type="month" id="monthFilter" class="form-control" value="@DateTime.Now.ToString("yyyy-MM")" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <button id="applyFilters" class="btn btn-primary d-block">Filtruj</button>
+            </div>
+        </div>
+
+        <div id="calendar-container" class="mt-4">
+            <!-- Calendar will be rendered here by JavaScript -->
+        </div>
+
+        <div class="mt-4">
+            <h5>Legenda</h5>
+            <div class="row">
+                <div class="col-md-3">
+                    <span class="badge bg-primary">urlop wypoczynkowy</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-danger">zwolnienie lekarskie</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-warning">urlop na żądanie</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-info">szkolenie</span>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-3">
+                    <span class="badge bg-secondary">inne</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const absences = @Html.Raw(Json.Serialize(Model.Select(n => new {
+        id = n.Id,
+        pracownikId = n.PracownikId,
+        pracownik = n.Pracownik.Imie + " " + n.Pracownik.Nazwisko,
+        typ = n.TypNieobecnosci,
+        dataOd = n.DataOd.ToString("yyyy-MM-dd"),
+        dataDo = n.DataDo.ToString("yyyy-MM-dd"),
+        liczbaDni = n.LiczbaDni,
+        uwagi = n.Uwagi
+    })));
+
+    function getAbsenceBadgeClass(typ) {
+        if (typ.includes('urlop wypoczynkowy')) return 'bg-primary';
+        if (typ.includes('zwolnienie')) return 'bg-danger';
+        if (typ.includes('żądanie')) return 'bg-warning';
+        if (typ.includes('szkolenie')) return 'bg-info';
+        return 'bg-secondary';
+    }
+
+    function renderCalendar(month, employeeId) {
+        const [year, monthNum] = month.split('-');
+        const date = new Date(year, monthNum - 1, 1);
+        const firstDay = date.getDay();
+        const daysInMonth = new Date(year, monthNum, 0).getDate();
+        
+        let filteredAbsences = absences.filter(a => {
+            const absenceStart = new Date(a.dataOd);
+            const absenceEnd = new Date(a.dataDo);
+            const monthStart = new Date(year, monthNum - 1, 1);
+            const monthEnd = new Date(year, monthNum, 0);
+            
+            if (employeeId && a.pracownikId != employeeId) return false;
+            
+            return (absenceStart <= monthEnd && absenceEnd >= monthStart);
+        });
+
+        let html = '<div class="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;">';
+        
+        // Headers
+        ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob', 'Niedz'].forEach(day => {
+            html += `<div class="text-center fw-bold p-2 border">${day}</div>`;
+        });
+        
+        // Adjust for Monday start (JavaScript uses Sunday as 0)
+        const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1;
+        
+        // Empty cells before first day
+        for (let i = 0; i < adjustedFirstDay; i++) {
+            html += '<div class="border p-2" style="min-height: 80px;"></div>';
+        }
+        
+        // Days
+        for (let day = 1; day <= daysInMonth; day++) {
+            const currentDate = new Date(year, monthNum - 1, day);
+            const dateStr = currentDate.toISOString().split('T')[0];
+            
+            const dayAbsences = filteredAbsences.filter(a => {
+                return dateStr >= a.dataOd && dateStr <= a.dataDo;
+            });
+            
+            const isWeekend = currentDate.getDay() === 0 || currentDate.getDay() === 6;
+            
+            html += `<div class="border p-2 ${isWeekend ? 'bg-light' : ''}" style="min-height: 80px;">
+                <div class="fw-bold">${day}</div>`;
+            
+            dayAbsences.forEach(absence => {
+                html += `<div class="badge ${getAbsenceBadgeClass(absence.typ)} w-100 text-truncate mt-1" 
+                         title="${absence.pracownik}: ${absence.typ}${absence.uwagi ? ' - ' + absence.uwagi : ''}"
+                         style="font-size: 0.7rem;">
+                    ${absence.pracownik.split(' ')[0]}
+                </div>`;
+            });
+            
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        
+        document.getElementById('calendar-container').innerHTML = html;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const monthFilter = document.getElementById('monthFilter');
+        const employeeFilter = document.getElementById('employeeFilter');
+        
+        // Initial render
+        renderCalendar(monthFilter.value, employeeFilter.value);
+        
+        // Apply filters
+        document.getElementById('applyFilters').addEventListener('click', function() {
+            renderCalendar(monthFilter.value, employeeFilter.value);
+        });
+    });
+</script>
+}

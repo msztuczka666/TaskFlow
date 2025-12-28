@@ -59,7 +59,15 @@ namespace TaskFlow.Controllers
         [Authorize(Roles = "Admin,Kierownik,Specjalista")]
         public IActionResult Create()
         {
-            ViewData["PracownikId"] = new SelectList(_context.Pracownicy, "Id", "Imie");
+            // Get only employed workers, sorted A-Z by first name
+            var pracownicy = _context.Pracownicy
+                .Where(p => p.StanZatrudnienia == "Zatrudniony")
+                .OrderBy(p => p.Imie)
+                .ThenBy(p => p.Nazwisko)
+                .Select(p => new { p.Id, FullName = p.Imie + " " + p.Nazwisko })
+                .ToList();
+            
+            ViewData["PracownikId"] = new SelectList(pracownicy, "Id", "FullName");
             ViewData["TypyNieobecnosci"] = TypyNieobecnosci.Wszystkie;
             return View();
         }
@@ -88,7 +96,15 @@ namespace TaskFlow.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PracownikId"] = new SelectList(_context.Pracownicy, "Id", "Imie", nieobecnosc.PracownikId);
+            
+            var pracownicy = _context.Pracownicy
+                .Where(p => p.StanZatrudnienia == "Zatrudniony")
+                .OrderBy(p => p.Imie)
+                .ThenBy(p => p.Nazwisko)
+                .Select(p => new { p.Id, FullName = p.Imie + " " + p.Nazwisko })
+                .ToList();
+            
+            ViewData["PracownikId"] = new SelectList(pracownicy, "Id", "FullName", nieobecnosc.PracownikId);
             ViewData["TypyNieobecnosci"] = TypyNieobecnosci.Wszystkie;
             return View(nieobecnosc);
         }
@@ -107,7 +123,15 @@ namespace TaskFlow.Controllers
             {
                 return NotFound();
             }
-            ViewData["PracownikId"] = new SelectList(_context.Pracownicy, "Id", "Imie", nieobecnosc.PracownikId);
+            
+            var pracownicy = _context.Pracownicy
+                .Where(p => p.StanZatrudnienia == "Zatrudniony")
+                .OrderBy(p => p.Imie)
+                .ThenBy(p => p.Nazwisko)
+                .Select(p => new { p.Id, FullName = p.Imie + " " + p.Nazwisko })
+                .ToList();
+            
+            ViewData["PracownikId"] = new SelectList(pracownicy, "Id", "FullName", nieobecnosc.PracownikId);
             ViewData["TypyNieobecnosci"] = TypyNieobecnosci.Wszystkie;
             return View(nieobecnosc);
         }
@@ -155,7 +179,15 @@ namespace TaskFlow.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PracownikId"] = new SelectList(_context.Pracownicy, "Id", "Imie", nieobecnosc.PracownikId);
+            
+            var pracownicy = _context.Pracownicy
+                .Where(p => p.StanZatrudnienia == "Zatrudniony")
+                .OrderBy(p => p.Imie)
+                .ThenBy(p => p.Nazwisko)
+                .Select(p => new { p.Id, FullName = p.Imie + " " + p.Nazwisko })
+                .ToList();
+            
+            ViewData["PracownikId"] = new SelectList(pracownicy, "Id", "FullName", nieobecnosc.PracownikId);
             ViewData["TypyNieobecnosci"] = TypyNieobecnosci.Wszystkie;
             return View(nieobecnosc);
         }

@@ -1,0 +1,40 @@
+@model TaskFlow.Models.Nieobecnosc
+@{
+    ViewData["Title"] = "Usuń nieobecność";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="alert alert-warning">
+    <h5>Czy na pewno chcesz usunąć tę nieobecność?</h5>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Pracownik</dt>
+            <dd class="col-sm-9">@Model.Pracownik.Imie @Model.Pracownik.Nazwisko</dd>
+
+            <dt class="col-sm-3">Typ nieobecności</dt>
+            <dd class="col-sm-9"><span class="badge bg-secondary">@Model.TypNieobecnosci</span></dd>
+
+            <dt class="col-sm-3">Data od</dt>
+            <dd class="col-sm-9">@Model.DataOd.ToString("dd.MM.yyyy")</dd>
+
+            <dt class="col-sm-3">Data do</dt>
+            <dd class="col-sm-9">@Model.DataDo.ToString("dd.MM.yyyy")</dd>
+
+            <dt class="col-sm-3">Liczba dni</dt>
+            <dd class="col-sm-9">@Model.LiczbaDni dni roboczych</dd>
+
+            <dt class="col-sm-3">Uwagi</dt>
+            <dd class="col-sm-9">@(Model.Uwagi ?? "-")</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-action="Delete" class="mt-3">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Potwierdź usunięcie</button>
+    <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+</form>

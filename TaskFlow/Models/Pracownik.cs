@@ -79,6 +79,11 @@ namespace TaskFlow.Models
         [Display(Name = "Informacje")]
         public string? Informacje { get; set; }
 
+        [Required(ErrorMessage = "Stan zatrudnienia jest wymagany")]
+        [StringLength(20)]
+        [Display(Name = "Stan zatrudnienia")]
+        public string StanZatrudnienia { get; set; } = "Zatrudniony"; // "Zatrudniony" lub "Zwolniony"
+
         public bool CzySEPWazny => DataWaznosciSEP.HasValue && DataWaznosciSEP.Value > DateTime.Now;
 
         public int DniDoWygasniecia => DataWaznosciSEP.HasValue 
@@ -98,6 +103,18 @@ namespace TaskFlow.Models
         {
             Nadzor,
             Pracownik
+        };
+    }
+
+    public static class StanyZatrudnienia
+    {
+        public const string Zatrudniony = "Zatrudniony";
+        public const string Zwolniony = "Zwolniony";
+
+        public static List<string> Wszystkie => new()
+        {
+            Zatrudniony,
+            Zwolniony
         };
     }
 }

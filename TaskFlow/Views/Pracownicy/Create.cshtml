@@ -122,10 +122,21 @@
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Informacje" class="form-label"></label>
-                <input asp-for="Informacje" class="form-control" maxlength="50" />
-                <span asp-validation-for="Informacje" class="text-danger"></span>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="StanZatrudnienia" class="form-label"></label>
+                    <select asp-for="StanZatrudnienia" class="form-select" required>
+                        <option value="">-- Wybierz stan --</option>
+                        <option value="Zatrudniony" selected>Zatrudniony</option>
+                        <option value="Zwolniony">Zwolniony</option>
+                    </select>
+                    <span asp-validation-for="StanZatrudnienia" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Informacje" class="form-label"></label>
+                    <input asp-for="Informacje" class="form-control" maxlength="50" />
+                    <span asp-validation-for="Informacje" class="text-danger"></span>
+                </div>
             </div>
 
             <div class="form-group mt-4">

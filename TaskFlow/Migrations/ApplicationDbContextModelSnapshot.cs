@@ -374,6 +374,11 @@ namespace TaskFlow.Migrations
                     b.Property<decimal?>("StawkaZlH")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("StanZatrudnienia")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("TypPracownika")
                         .IsRequired()
                         .HasMaxLength(20)

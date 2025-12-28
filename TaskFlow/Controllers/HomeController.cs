@@ -31,8 +31,9 @@ public class HomeController : Controller
                 .ToListAsync()
         };
 
-        // Pobierz wszystkich pracowników (sortowanie A-Z po imieniu i nazwisku)
+        // Pobierz wszystkich pracowników ZATRUDNIONYCH (sortowanie A-Z po imieniu i nazwisku)
         var wszyscyPracownicy = await _context.Pracownicy
+            .Where(p => p.StanZatrudnienia == "Zatrudniony")
             .OrderBy(p => p.Imie)
             .ThenBy(p => p.Nazwisko)
             .ToListAsync();

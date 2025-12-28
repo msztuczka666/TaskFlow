@@ -68,6 +68,18 @@
             <dt class="col-sm-3">@Html.DisplayNameFor(model => model.StawkaZlH)</dt>
             <dd class="col-sm-9">@(Model.StawkaZlH?.ToString("F2") ?? "-") PLN/h</dd>
 
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.StanZatrudnienia)</dt>
+            <dd class="col-sm-9">
+                @if (Model.StanZatrudnienia == "Zatrudniony")
+                {
+                    <span class="badge bg-success">@Model.StanZatrudnienia</span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">@Model.StanZatrudnienia</span>
+                }
+            </dd>
+
             <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Informacje)</dt>
             <dd class="col-sm-9">@(Model.Informacje ?? "-")</dd>
         </dl>

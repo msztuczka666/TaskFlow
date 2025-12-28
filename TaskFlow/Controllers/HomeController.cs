@@ -31,10 +31,10 @@ public class HomeController : Controller
                 .ToListAsync()
         };
 
-        // Pobierz wszystkich pracowników
+        // Pobierz wszystkich pracowników (sortowanie A-Z po imieniu i nazwisku)
         var wszyscyPracownicy = await _context.Pracownicy
-            .OrderBy(p => p.Nazwisko)
-            .ThenBy(p => p.Imie)
+            .OrderBy(p => p.Imie)
+            .ThenBy(p => p.Nazwisko)
             .ToListAsync();
 
         // Pobierz ewidencję czasu dla wybranej daty

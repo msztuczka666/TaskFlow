@@ -1,4 +1,5 @@
-﻿@model TaskFlow.ViewModels.DziennikGodzinViewModel
+﻿@inject Microsoft.AspNetCore.Identity.UserManager<TaskFlow.Models.ApplicationUser> UserManager
+@model TaskFlow.ViewModels.DziennikGodzinViewModel
 @{
     ViewData["Title"] = "Dziennik Godzin";
     Layout = "_Layout";
@@ -69,7 +70,13 @@
     <!-- FOOTER -->
     <div class="footer">
         <div class="footer-left">
-            Ostatnia zmiana: <strong>@DateTime.Now.ToString("dd.MM.yyyy HH:mm")</strong> - @User.Identity.Name
+            @{
+                var currentUser = await UserManager.GetUserAsync(User);
+                var lastChangeUser = currentUser != null && !string.IsNullOrEmpty(currentUser.Imie) && !string.IsNullOrEmpty(currentUser.Nazwisko)
+                    ? $"{currentUser.Imie} {currentUser.Nazwisko}"
+                    : User.Identity.Name;
+            }
+            Ostatnia zmiana: <strong>@DateTime.Now.ToString("dd.MM.yyyy HH:mm")</strong> - @lastChangeUser
         </div>
         <div class="footer-right">
             <button class="btn-cancel" onclick="cancelChanges()">Anuluj</button>
@@ -108,12 +115,13 @@
         let isDirty = false;
         let entryIdCounter = 1;
 
-        // Generate time options (every 30 minutes)
+        // Generate time options (every 30 minutes from 00:30 to 24:00)
         function generateTimeOptions() {
             const options = [];
-            for (let h = 6; h <= 24; h++) {
+            for (let h = 0; h <= 24; h++) {
                 for (let m = 0; m < 60; m += 30) {
-                    if (h === 24 && m > 0) break;
+                    if (h === 0 && m === 0) continue; // Skip 00:00
+                    if (h === 24 && m > 0) break;      // Stop after 24:00
                     const hour = h.toString().padStart(2, '0');
                     const minute = m.toString().padStart(2, '0');
                     options.push(`${hour}:${minute}`);

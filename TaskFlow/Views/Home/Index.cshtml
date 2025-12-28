@@ -115,12 +115,11 @@
         let isDirty = false;
         let entryIdCounter = 1;
 
-        // Generate time options (every 30 minutes from 00:30 to 24:00)
+        // Generate time options (every 30 minutes from 00:00 to 24:00)
         function generateTimeOptions() {
             const options = [];
             for (let h = 0; h <= 24; h++) {
                 for (let m = 0; m < 60; m += 30) {
-                    if (h === 0 && m === 0) continue; // Skip 00:00
                     if (h === 24 && m > 0) break;      // Stop after 24:00
                     const hour = h.toString().padStart(2, '0');
                     const minute = m.toString().padStart(2, '0');
@@ -210,21 +209,41 @@
             const total = totalMinutes / 60;
 
             // Regular hours: 6:30 - 14:30 (8 hours)
+            // Overtime: 00:00 - 6:30 and 14:30 - 24:00
+            const regularStartMinutes = 6 * 60 + 30; // 6:30
             const regularEndMinutes = 14 * 60 + 30; // 14:30
 
             let regularMinutes = 0;
             let overtimeMinutes = 0;
 
-            if (minutesTo <= regularEndMinutes) {
-                // All work is regular hours
-                regularMinutes = totalMinutes;
-            } else if (minutesFrom >= regularEndMinutes) {
-                // All work is overtime
+            // Check if work is before regular hours (00:00 - 6:30)
+            if (minutesTo <= regularStartMinutes) {
+                // All work is overtime (early morning)
                 overtimeMinutes = totalMinutes;
-            } else {
-                // Work spans both regular and overtime
-                regularMinutes = regularEndMinutes - minutesFrom;
-                overtimeMinutes = minutesTo - regularEndMinutes;
+            } else if (minutesFrom >= regularEndMinutes) {
+                // All work is overtime (after 14:30)
+                overtimeMinutes = totalMinutes;
+            } else if (minutesFrom < regularStartMinutes && minutesTo > regularStartMinutes) {
+                // Work spans early morning overtime and regular hours
+                if (minutesTo <= regularEndMinutes) {
+                    // Ends within regular hours
+                    overtimeMinutes = regularStartMinutes - minutesFrom;
+                    regularMinutes = minutesTo - regularStartMinutes;
+                } else {
+                    // Spans early morning, regular, and late overtime
+                    overtimeMinutes = (regularStartMinutes - minutesFrom) + (minutesTo - regularEndMinutes);
+                    regularMinutes = regularEndMinutes - regularStartMinutes;
+                }
+            } else if (minutesFrom >= regularStartMinutes && minutesFrom < regularEndMinutes) {
+                // Work starts within regular hours
+                if (minutesTo <= regularEndMinutes) {
+                    // All within regular hours
+                    regularMinutes = totalMinutes;
+                } else {
+                    // Spans regular and late overtime
+                    regularMinutes = regularEndMinutes - minutesFrom;
+                    overtimeMinutes = minutesTo - regularEndMinutes;
+                }
             }
 
             return {

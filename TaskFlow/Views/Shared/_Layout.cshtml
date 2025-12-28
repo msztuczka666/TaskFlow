@@ -161,14 +161,11 @@
         </main>
     </div>
 
-    @if (ViewContext.RouteData.Values["Controller"]?.ToString() != "Home" || ViewContext.RouteData.Values["Action"]?.ToString() != "Index")
-    {
-        <footer>
-            <div class="container">
-                © 2025 - TaskFlow - Synthraxis - Mariusz Sztuczka
-            </div>
-        </footer>
-    }
+    <footer>
+        <div class="container">
+            © 2025 - TaskFlow - Synthraxis - Mariusz Sztuczka
+        </div>
+    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

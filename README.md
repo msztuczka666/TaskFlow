@@ -97,8 +97,8 @@ TaskFlow/
    ```
 
 6. **Default Admin Credentials**:
-   - Email: sztuczka@onet.pl
-   - Password: M@rroq753
+   - Email: admin@taskflow.com
+   - Password: Admin123!
 
 ## User Roles
 

@@ -687,9 +687,11 @@ namespace TaskFlow.Controllers
                                 TimeZone = overtimeDetails.TimeZone
                             };
                         })
+                        .Where(d => d.Multiplier > 1.0m) // Only show overtime (multiplier > 1.0), exclude standard hours
                         .OrderBy(d => d.Date)
                         .ToList()
                 })
+                .Where(e => e.Days.Any()) // Only include employees who have overtime
                 .ToList();
 
             model.Data = grouped;

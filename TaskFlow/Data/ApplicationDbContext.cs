@@ -1,14 +1,26 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using TaskFlow.Models;
+using System.Text.Json;
 
 namespace TaskFlow.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        private readonly IHttpContextAccessor? _httpContextAccessor;
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+        }
+
+        public ApplicationDbContext(
+            DbContextOptions<ApplicationDbContext> options,
+            IHttpContextAccessor httpContextAccessor)
+            : base(options)
+        {
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public DbSet<Pracownik> Pracownicy { get; set; }
@@ -61,6 +73,94 @@ namespace TaskFlow.Data
                       .OnDelete(DeleteBehavior.Restrict);
                 entity.HasIndex(e => new { e.Data, e.PracownikId });
             });
+        }
+
+        public override int SaveChanges()
+        {
+            AddAuditLogs();
+            return base.SaveChanges();
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            AddAuditLogs();
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void AddAuditLogs()
+        {
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.Entity is not AuditLog && // Don't log audit logs themselves
+                           (e.State == EntityState.Added ||
+                            e.State == EntityState.Modified ||
+                            e.State == EntityState.Deleted))
+                .ToList();
+
+            if (!entries.Any()) return;
+
+            var userName = _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "System";
+            var ipAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown";
+            var userAgent = _httpContextAccessor?.HttpContext?.Request?.Headers["User-Agent"].ToString() ?? "Unknown";
+
+            foreach (var entry in entries)
+            {
+                var auditLog = new AuditLog
+                {
+                    Id = Guid.NewGuid(),
+                    EntityName = entry.Entity.GetType().Name,
+                    Action = entry.State.ToString(),
+                    Timestamp = DateTime.UtcNow,
+                    UserId = userName,
+                    IpAddress = ipAddress,
+                    UserAgent = userAgent
+                };
+
+                if (entry.State == EntityState.Added)
+                {
+                    auditLog.NewValues = SerializeEntity(entry);
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    auditLog.OldValues = SerializeOriginalValues(entry);
+                    auditLog.NewValues = SerializeCurrentValues(entry);
+                }
+                else if (entry.State == EntityState.Deleted)
+                {
+                    auditLog.OldValues = SerializeEntity(entry);
+                }
+
+                AuditLogs.Add(auditLog);
+            }
+        }
+
+        private string SerializeEntity(EntityEntry entry)
+        {
+            var values = new Dictionary<string, object?>();
+            foreach (var property in entry.Properties)
+            {
+                values[property.Metadata.Name] = property.CurrentValue;
+            }
+            return JsonSerializer.Serialize(values);
+        }
+
+        private string SerializeOriginalValues(EntityEntry entry)
+        {
+            var values = new Dictionary<string, object?>();
+            foreach (var property in entry.Properties.Where(p => p.IsModified))
+            {
+                values[property.Metadata.Name] = property.OriginalValue;
+            }
+            return JsonSerializer.Serialize(values);
+        }
+
+        private string SerializeCurrentValues(EntityEntry entry)
+        {
+            var values = new Dictionary<string, object?>();
+            foreach (var property in entry.Properties.Where(p => p.IsModified))
+            {
+                values[property.Metadata.Name] = property.CurrentValue;
+            }
+            return JsonSerializer.Serialize(values);
         }
     }
 }

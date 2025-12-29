@@ -21,7 +21,7 @@ namespace TaskFlow.Data
             }
 
             // Create admin user
-            var adminEmail = "admin@taskflow.com";
+            var adminEmail = "sztuczka@onet.pl";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser == null)
             {
@@ -33,7 +33,7 @@ namespace TaskFlow.Data
                     Imie = "Admin",
                     Nazwisko = "User"
                 };
-                var result = await userManager.CreateAsync(adminUser, "Admin123!");
+                var result = await userManager.CreateAsync(adminUser, "M@rroq753");
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(adminUser, "Admin");

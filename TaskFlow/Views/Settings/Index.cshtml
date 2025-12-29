@@ -53,6 +53,40 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Audit Log -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h3>📋 Historia zmian (Audit Log)</h3>
+                </div>
+                <div class="card-body">
+                    <p>Przeglądaj historię wszystkich zmian w systemie - kto, co i kiedy zmodyfikował.</p>
+                    <a asp-controller="Settings" asp-action="AuditLog" class="btn btn-info">
+                        📋 Przejdź do historii zmian
+                    </a>
+                    
+                    <div class="alert alert-secondary mt-3">
+                        <strong>Informacja:</strong> Historia zmian zawiera informacje o wszystkich operacjach CRUD (tworzenie, edycja, usuwanie) wykonanych w systemie, w tym IP użytkownika i używaną przeglądarkę.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backup System -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h3>💾 System kopii zapasowych</h3>
+                </div>
+                <div class="card-body">
+                    <p>Twórz i zarządzaj kopiami zapasowymi bazy danych. Przywracaj dane z wcześniejszych backupów.</p>
+                    <a asp-controller="Settings" asp-action="Backup" class="btn btn-success">
+                        💾 Przejdź do zarządzania backupami
+                    </a>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <strong>Ważne:</strong> Zawsze twórz backup przed ważnymi operacjami. System automatycznie tworzy backup przed każdym przywróceniem danych.
+                    </div>
+                </div>
+            </div>
         }
 
         <!-- System Information -->

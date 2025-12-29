@@ -35,6 +35,10 @@ TestResult.xml
 *.db-shm
 *.db-wal
 
+# Backup files
+Backups/
+!Backups/.gitkeep
+
 # Node modules
 node_modules/
 

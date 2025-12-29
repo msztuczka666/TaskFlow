@@ -1,0 +1,199 @@
+@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "System kopii zapasowych";
+}
+
+<h1>💾 System kopii zapasowych</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h3>Tworzenie nowego backupu</h3>
+    </div>
+    <div class="card-body">
+        <p>Utwórz kopię zapasową bazy danych. Backup zostanie zapisany w folderze <code>Backups</code> w katalogu głównym aplikacji.</p>
+        <form asp-action="CreateBackup" method="post">
+            <button type="submit" class="btn btn-success" onclick="return confirm('Czy na pewno chcesz utworzyć backup bazy danych?');">
+                💾 Utwórz nowy backup
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary ms-2">Powrót do ustawień</a>
+        </form>
+        
+        <div class="alert alert-info mt-3">
+            <strong>Wskazówka:</strong> Regularne tworzenie backupów chroni przed utratą danych. Zalecane jest tworzenie backupu przed ważnymi operacjami w systemie.
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h3>Lista dostępnych backupów (@Model.Count())</h3>
+    </div>
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nazwa pliku</th>
+                            <th>Data utworzenia</th>
+                            <th>Rozmiar</th>
+                            <th>Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #e2e8f0;">
+                        @foreach (var backup in Model)
+                        {
+                            <tr class="table-row-hover">
+                                <td>@backup.FileName</td>
+                                <td>@backup.CreationTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                <td>@((backup.Size / 1024.0).ToString("N2")) KB</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="DownloadBackup" asp-route-fileName="@backup.FileName" class="btn btn-sm btn-info" title="Pobierz backup">
+                                            📥 Pobierz
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#restoreModal_@backup.FileName.Replace(".", "_")" title="Przywróć z backupu">
+                                            ♻️ Przywróć
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal_@backup.FileName.Replace(".", "_")" title="Usuń backup">
+                                            🗑️ Usuń
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            @* Restore Confirmation Modal *@
+                            <div class="modal fade" id="restoreModal_@backup.FileName.Replace(".", "_")" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Potwierdzenie przywracania</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" style="color: #212529;">
+                                            <p><strong>Czy na pewno chcesz przywrócić bazę danych z backupu?</strong></p>
+                                            <p class="text-danger">⚠️ <strong>UWAGA:</strong> Ta operacja nadpisze obecną bazę danych. Obecna baza zostanie automatycznie zachowana jako backup przed przywróceniem.</p>
+                                            <p><strong>Backup do przywrócenia:</strong></p>
+                                            <ul>
+                                                <li>Plik: <code>@backup.FileName</code></li>
+                                                <li>Data utworzenia: @backup.CreationTime.ToString("yyyy-MM-dd HH:mm:ss")</li>
+                                                <li>Rozmiar: @((backup.Size / 1024.0).ToString("N2")) KB</li>
+                                            </ul>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                                            <form asp-action="RestoreBackup" method="post" class="d-inline">
+                                                <input type="hidden" name="fileName" value="@backup.FileName" />
+                                                <button type="submit" class="btn btn-warning">♻️ Przywróć</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* Delete Confirmation Modal *@
+                            <div class="modal fade" id="deleteModal_@backup.FileName.Replace(".", "_")" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Potwierdzenie usunięcia</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" style="color: #212529;">
+                                            <p><strong>Czy na pewno chcesz usunąć ten backup?</strong></p>
+                                            <p class="text-danger">⚠️ <strong>UWAGA:</strong> Ta operacja jest nieodwracalna. Po usunięciu backup nie będzie można przywrócić.</p>
+                                            <p><strong>Backup do usunięcia:</strong></p>
+                                            <ul>
+                                                <li>Plik: <code>@backup.FileName</code></li>
+                                                <li>Data utworzenia: @backup.CreationTime.ToString("yyyy-MM-dd HH:mm:ss")</li>
+                                            </ul>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                                            <form asp-action="DeleteBackup" method="post" class="d-inline">
+                                                <input type="hidden" name="fileName" value="@backup.FileName" />
+                                                <button type="submit" class="btn btn-danger">🗑️ Usuń</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <strong>Brak dostępnych backupów.</strong>
+                <p class="mb-0 mt-2">Utwórz pierwszy backup klikając przycisk "Utwórz nowy backup" powyżej.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h3>Ważne informacje o backupach</h3>
+    </div>
+    <div class="card-body">
+        <h5>✅ Najlepsze praktyki:</h5>
+        <ul>
+            <li>Twórz regularne backupy (zalecane: codziennie lub przed ważnymi operacjami)</li>
+            <li>Przechowuj backupy w bezpiecznym miejscu poza serwerem aplikacji</li>
+            <li>Testuj proces przywracania na środowisku testowym</li>
+            <li>Zachowuj kopie backupów z różnych dni (wersjonowanie)</li>
+        </ul>
+
+        <h5 class="mt-3">📋 Proces przywracania:</h5>
+        <ol>
+            <li>System automatycznie tworzy backup obecnej bazy przed przywróceniem</li>
+            <li>Baza danych zostaje zastąpiona wybranym backupem</li>
+            <li>Po przywróceniu musisz odświeżyć aplikację (F5)</li>
+            <li>Backup przed przywróceniem zostaje zachowany dla bezpieczeństwa</li>
+        </ol>
+
+        <h5 class="mt-3">⚠️ Ostrzeżenia:</h5>
+        <ul class="text-warning">
+            <li><strong>Przywracanie backupu nadpisuje obecną bazę danych</strong></li>
+            <li>Wszystkie zmiany dokonane po dacie utworzenia backupu zostaną utracone</li>
+            <li>Upewnij się, że przywracasz właściwy backup (sprawdź datę)</li>
+            <li>Zalecane jest wykonanie testu na środowisku testowym przed przywróceniem na produkcji</li>
+        </ul>
+    </div>
+</div>
+
+<style>
+    .table-row-hover {
+        transition: all 0.3s ease;
+        background: rgba(71, 85, 105, 0.1);
+    }
+    .table-row-hover:hover {
+        background: rgba(245, 158, 11, 0.15) !important;
+        border-color: rgba(245, 158, 11, 0.4);
+        transform: translateX(2px);
+    }
+    .table-dark {
+        background-color: #343a40;
+        color: white;
+    }
+</style>

@@ -92,6 +92,17 @@ namespace TaskFlow.Controllers
                 // Calculate hours based on absence type
                 nieobecnosc.LiczbaGodzin = TypyNieobecnosci.ObliczGodziny(nieobecnosc.TypNieobecnosci, nieobecnosc.LiczbaDni);
 
+                // Deduct vacation days if this is "Urlop wypoczynkowy" (vacation)
+                if (nieobecnosc.TypNieobecnosci == "Urlop wypoczynkowy")
+                {
+                    var pracownik = await _context.Pracownicy.FindAsync(nieobecnosc.PracownikId);
+                    if (pracownik != null)
+                    {
+                        // Deduct vacation days from employee's available vacation days
+                        pracownik.LiczbaDniWykorzystanych += nieobecnosc.LiczbaDni;
+                    }
+                }
+
                 _context.Add(nieobecnosc);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

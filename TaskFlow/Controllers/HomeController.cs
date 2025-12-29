@@ -169,7 +169,9 @@ public class HomeController : Controller
                 }
             }
 
-            // Add vacation days for employees who worked on Sunday/holiday
+            await _context.SaveChangesAsync();
+
+            // Add vacation days for employees who worked on Sunday/holiday (after initial save)
             if (employeesWorkedSundayHoliday.Any())
             {
                 var employees = await _context.Pracownicy
@@ -178,11 +180,11 @@ public class HomeController : Controller
 
                 foreach (var employee in employees)
                 {
-                    employee.LiczbaDniWolnych += 1; // Add 1 vacation day
+                    employee.LiczbaDniWolnych += 1; // Add 1 vacation day for working on Sunday/holiday
                 }
-            }
 
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // Save vacation day updates
+            }
             return Ok();
         }
         catch (Exception ex)

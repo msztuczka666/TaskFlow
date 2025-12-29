@@ -98,7 +98,7 @@
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped">
-                        <thead class="table-dark">
+                        <thead style="background-color: #343a40;">
                             <tr>
                                 <th style="width: 15%; color: white;">Nr zlecenia</th>
                                 <th style="width: 60%; color: white;">Opis zlecenia</th>
@@ -109,17 +109,17 @@
                             @foreach (var order in Model.Data)
                             {
                                 <tr>
-                                    <td class="fw-bold">@order.NrZlecenia</td>
-                                    <td>@order.OpisZlecenia</td>
+                                    <td class="fw-bold" style="color: #212529;">@order.NrZlecenia</td>
+                                    <td style="color: #212529;">@order.OpisZlecenia</td>
                                     <td class="text-end">
                                         <span class="badge bg-primary fs-6">@order.TotalHours.ToString("F2") h</span>
                                     </td>
                                 </tr>
                             }
                         </tbody>
-                        <tfoot class="table-light">
+                        <tfoot style="background-color: #f8f9fa;">
                             <tr>
-                                <td colspan="2" class="fw-bold text-end">Łączna suma godzin:</td>
+                                <td colspan="2" class="fw-bold text-end" style="color: #212529;">Łączna suma godzin:</td>
                                 <td class="text-end">
                                     <span class="badge bg-dark fs-5">@Model.Data.Sum(o => o.TotalHours).ToString("F2") h</span>
                                 </td>

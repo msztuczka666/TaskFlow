@@ -78,7 +78,7 @@
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped">
-                        <thead class="table-dark">
+                        <thead style="background-color: #343a40;">
                             <tr>
                                 <th style="width: 40%; color: white;">Pracownik (Imię i Nazwisko)</th>
                                 <th class="text-center" style="width: 20%; color: white;">
@@ -100,7 +100,7 @@
                             {
                                 var badgeClass = emp.UrlopPozostaly > 0 ? "bg-success" : "bg-danger";
                                 <tr>
-                                    <td class="fw-bold">@emp.PracownikPelneImie</td>
+                                    <td class="fw-bold" style="color: #212529;">@emp.PracownikPelneImie</td>
                                     <td class="text-center">
                                         <span class="badge bg-primary fs-6">@emp.LiczbaDniWolnych</span>
                                     </td>
@@ -113,9 +113,9 @@
                                 </tr>
                             }
                         </tbody>
-                        <tfoot class="table-light">
+                        <tfoot style="background-color: #f8f9fa;">
                             <tr>
-                                <td class="fw-bold">Suma:</td>
+                                <td class="fw-bold" style="color: #212529;">Suma:</td>
                                 <td class="text-center">
                                     <span class="badge bg-primary fs-5">@Model.Data.Sum(e => e.LiczbaDniWolnych)</span>
                                 </td>

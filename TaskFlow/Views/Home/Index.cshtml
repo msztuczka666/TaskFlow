@@ -443,24 +443,41 @@
             }
 
             try {
-                const response = await fetch(`@Url.Action("GetDayEntries")?data=${previousDate}`);
-                const data = await response.json();
+                // Search backwards up to 14 days to find a day with data
+                let foundData = false;
+                let searchDate = new Date(previousDate);
+                const maxDaysBack = 14;
+                
+                for (let i = 0; i < maxDaysBack && !foundData; i++) {
+                    const searchDateStr = searchDate.toISOString().split('T')[0];
+                    const response = await fetch(`@Url.Action("GetDayEntries")?data=${searchDateStr}`);
+                    const data = await response.json();
 
-                if (data && data.length > 0) {
-                    entries = data.map((e, index) => ({
-                        id: entryIdCounter++,
-                        pracownikId: e.pracownikId,
-                        godzinaOd: e.godzinaOd,
-                        godzinaDo: e.godzinaDo,
-                        zlecenieId: e.zlecenieId,
-                        opisPrac: e.opisPrac || ''
-                    }));
-                    renderEntries();
-                    updateStatistics();
-                    markAsDirty();
-                    alert('Skopiowano wpisy z poprzedniego dnia!');
-                } else {
-                    alert('Brak wpisów z poprzedniego dnia.');
+                    if (data && data.length > 0) {
+                        entries = data.map((e, index) => ({
+                            id: entryIdCounter++,
+                            pracownikId: e.pracownikId,
+                            godzinaOd: e.godzinaOd,
+                            godzinaDo: e.godzinaDo,
+                            zlecenieId: e.zlecenieId,
+                            opisPrac: e.opisPrac || ''
+                        }));
+                        renderEntries();
+                        updateStatistics();
+                        markAsDirty();
+                        
+                        const daysDiff = i + 1;
+                        const dayLabel = daysDiff === 1 ? 'poprzedniego dnia' : `${daysDiff} dni wstecz`;
+                        alert(`Skopiowano wpisy z ${dayLabel} (${searchDateStr})!`);
+                        foundData = true;
+                    } else {
+                        // Go back one more day
+                        searchDate.setDate(searchDate.getDate() - 1);
+                    }
+                }
+                
+                if (!foundData) {
+                    alert(`Brak wpisów w ostatnich ${maxDaysBack} dniach.`);
                 }
             } catch (error) {
                 console.error('Error copying from previous day:', error);

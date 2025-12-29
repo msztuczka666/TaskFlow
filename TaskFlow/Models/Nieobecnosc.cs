@@ -6,18 +6,20 @@ namespace TaskFlow.Models
     {
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Pracownik jest wymagany")]
         public int PracownikId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Data od jest wymagana")]
         [Display(Name = "Data od")]
+        [DataType(DataType.Date)]
         public DateTime DataOd { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Data do jest wymagana")]
         [Display(Name = "Data do")]
+        [DataType(DataType.Date)]
         public DateTime DataDo { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Typ nieobecności jest wymagany")]
         [StringLength(100)]
         [Display(Name = "Typ nieobecności")]
         public string TypNieobecnosci { get; set; } = string.Empty;

@@ -11,14 +11,14 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
                 <label asp-for="PracownikId" class="form-label">Pracownik <span class="text-danger">*</span></label>
-                <select asp-for="PracownikId" class="form-select" asp-items="@(ViewData["PracownikId"] as SelectList)" required>
+                <select asp-for="PracownikId" class="form-select" asp-items="@(ViewData["PracownikId"] as SelectList)">
                     <option value="">-- Wybierz pracownika --</option>
                 </select>
                 <span asp-validation-for="PracownikId" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="TypNieobecnosci" class="form-label">Typ nieobecności <span class="text-danger">*</span></label>
-                <select asp-for="TypNieobecnosci" class="form-select" required>
+                <select asp-for="TypNieobecnosci" class="form-select">
                     <option value="">-- Wybierz typ nieobecności --</option>
                     @foreach (var typ in (List<string>)ViewData["TypyNieobecnosci"])
                     {
@@ -29,12 +29,12 @@
             </div>
             <div class="mb-3">
                 <label asp-for="DataOd" class="form-label">Data od <span class="text-danger">*</span></label>
-                <input asp-for="DataOd" class="form-control" type="date" required />
+                <input asp-for="DataOd" class="form-control" type="date" />
                 <span asp-validation-for="DataOd" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="DataDo" class="form-label">Data do <span class="text-danger">*</span></label>
-                <input asp-for="DataDo" class="form-control" type="date" required />
+                <input asp-for="DataDo" class="form-control" type="date" />
                 <span asp-validation-for="DataDo" class="text-danger"></span>
             </div>
             <div class="mb-3">

@@ -151,10 +151,9 @@ namespace TaskFlow.Helpers
             }
 
             // Dni powszednie: nadgodziny jeśli nie w strefie standardowej (6:30-14:30)
-            var start630 = new TimeSpan(6, 30, 0);
-            var end1430 = new TimeSpan(14, 30, 0);
-
-            return startTime < start630 || startTime >= end1430;
+            // ZAWSZE zwracamy true dla dni powszednich, aby pokazać również nadgodziny w strefach 14:30-21:00 i 21:00-6:30
+            // Filtrowanie według mnożnika != 1.0 jest w kontrolerze
+            return true;
         }
     }
 

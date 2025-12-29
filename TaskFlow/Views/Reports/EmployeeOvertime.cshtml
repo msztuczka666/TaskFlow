@@ -129,25 +129,25 @@
                                 }
                                 @foreach (var date in allDates)
                                 {
-                                    <th class="text-center" style="min-width: 120px;">
+                                    <th class="text-center" style="min-width: 120px; color: white;">
                                         @date.ToString("dd.MM.yyyy")<br/>
-                                        <small class="text-muted">@date.ToString("dddd", new System.Globalization.CultureInfo("pl-PL"))</small>
+                                        <small style="color: #adb5bd;">@date.ToString("dddd", new System.Globalization.CultureInfo("pl-PL"))</small>
                                     </th>
                                 }
-                                <th class="text-end" style="background-color: #f8f9fa; color: #212529;">Suma (nadgodziny)</th>
+                                <th class="text-end" style="background-color: #343a40; color: white;">Suma (nadgodziny)</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="background-color: #f8f9fa;">
                             @foreach (var employee in Model.Data)
                             {
-                                <tr class="table-row-hover" style="color: #e2e8f0;">
-                                    <td class="sticky-left" style="left: 0; z-index: 5; background-color: #f8f9fa; color: #212529; font-weight: bold;">
+                                <tr class="table-row-hover">
+                                    <td class="sticky-left" style="left: 0; z-index: 5; background-color: #ffffff; color: #212529; font-weight: bold;">
                                         @employee.PracownikPelneImie
                                     </td>
                                     @foreach (var date in allDates)
                                     {
                                         var dayData = employee.Days.FirstOrDefault(d => d.Date == date);
-                                        <td class="text-center" style="color: #212529;">
+                                        <td class="text-center" style="color: #212529; background-color: #ffffff;">
                                             @if (dayData != null)
                                             {
                                                 <div>
@@ -167,24 +167,24 @@
                                             }
                                         </td>
                                     }
-                                    <td class="text-end" style="background-color: #f8f9fa; color: #212529;">
+                                    <td class="text-end" style="background-color: #ffffff; color: #212529;">
                                         <strong>@employee.Days.Sum(d => d.OvertimeHours).ToString("F2") h</strong>
                                     </td>
                                 </tr>
                             }
                         </tbody>
-                        <tfoot style="background-color: #f8f9fa;">
+                        <tfoot style="background-color: #e9ecef;">
                             <tr style="color: #212529;">
-                                <th class="sticky-left" style="left: 0; z-index: 5; background-color: #f8f9fa;">Suma dzienna:</th>
+                                <th class="sticky-left" style="left: 0; z-index: 5; background-color: #e9ecef; color: #212529;">Suma dzienna:</th>
                                 @foreach (var date in allDates)
                                 {
                                     var dailyTotal = Model.Data
                                         .SelectMany(e => e.Days)
                                         .Where(d => d.Date == date)
                                         .Sum(d => d.OvertimeHours);
-                                    <th class="text-center">@dailyTotal.ToString("F2") h</th>
+                                    <th class="text-center" style="color: #212529;">@dailyTotal.ToString("F2") h</th>
                                 }
-                                <th class="text-end">
+                                <th class="text-end" style="color: #212529;">
                                     <strong>@Model.Data.SelectMany(e => e.Days).Sum(d => d.OvertimeHours).ToString("F2") h</strong>
                                 </th>
                             </tr>
@@ -219,12 +219,12 @@
         position: sticky;
         left: 0;
         z-index: 5;
-        background-color: #f8f9fa;
+        background-color: #ffffff;
     }
     
     .table-row-hover {
         transition: all 0.3s ease;
-        background: rgba(71, 85, 105, 0.1);
+        background-color: #ffffff;
     }
     
     .table-row-hover:hover {

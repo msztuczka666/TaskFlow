@@ -126,29 +126,29 @@
                                     <table class="table table-sm table-bordered">
                                         <thead class="table-dark" style="background-color: #343a40; color: white;">
                                             <tr>
-                                                <th>Pracownik</th>
-                                                <th class="text-end">Godziny</th>
-                                                <th class="text-end">Stawka (zł/h)</th>
-                                                <th class="text-end">Koszt (zł)</th>
+                                                <th style="color: white;">Pracownik</th>
+                                                <th class="text-end" style="color: white;">Godziny</th>
+                                                <th class="text-end" style="color: white;">Stawka (zł/h)</th>
+                                                <th class="text-end" style="color: white;">Koszt (zł)</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody style="background-color: #ffffff;">
                                             @foreach (var emp in workGroup.EmployeeDetails)
                                             {
-                                                <tr style="color: #212529;">
-                                                    <td>@emp.PracownikPelneImie</td>
-                                                    <td class="text-end">@emp.Hours.ToString("F2")</td>
-                                                    <td class="text-end">@emp.StawkaZlH.ToString("F2")</td>
-                                                    <td class="text-end"><strong>@emp.Cost.ToString("F2")</strong></td>
+                                                <tr style="color: #212529; background-color: #ffffff;">
+                                                    <td style="color: #212529;">@emp.PracownikPelneImie</td>
+                                                    <td class="text-end" style="color: #212529;">@emp.Hours.ToString("F2")</td>
+                                                    <td class="text-end" style="color: #212529;">@emp.StawkaZlH.ToString("F2")</td>
+                                                    <td class="text-end" style="color: #212529;"><strong>@emp.Cost.ToString("F2")</strong></td>
                                                 </tr>
                                             }
                                         </tbody>
-                                        <tfoot style="background-color: #f8f9fa;">
+                                        <tfoot style="background-color: #e9ecef;">
                                             <tr style="color: #212529;">
-                                                <th>Suma dla pracy:</th>
-                                                <th class="text-end">@workGroup.TotalHours.ToString("F2") h</th>
+                                                <th style="color: #212529;">Suma dla pracy:</th>
+                                                <th class="text-end" style="color: #212529;">@workGroup.TotalHours.ToString("F2") h</th>
                                                 <th></th>
-                                                <th class="text-end">@workGroup.TotalCost.ToString("F2") zł</th>
+                                                <th class="text-end" style="color: #212529;">@workGroup.TotalCost.ToString("F2") zł</th>
                                             </tr>
                                         </tfoot>
                                     </table>

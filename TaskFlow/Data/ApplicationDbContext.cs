@@ -15,6 +15,7 @@ namespace TaskFlow.Data
         public DbSet<Nieobecnosc> Nieobecnosci { get; set; }
         public DbSet<Zlecenie> Zlecenia { get; set; }
         public DbSet<EwidencjaCzasu> EwidencjaCzasu { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

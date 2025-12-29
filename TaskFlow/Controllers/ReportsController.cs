@@ -228,12 +228,12 @@ namespace TaskFlow.Controllers
 
             // Group by order
             var grouped = data
-                .GroupBy(e => new { e.ZlecenieId, e.Zlecenie.NrZlecenia, e.Zlecenie.OpisZlecenia })
+                .GroupBy(e => new { e.ZlecenieId, e.Zlecenie.NrZlecenia, e.Zlecenie.Opis })
                 .Select(g => new OrderHoursRow
                 {
                     ZlecenieId = g.Key.ZlecenieId,
                     NrZlecenia = g.Key.NrZlecenia,
-                    OpisZlecenia = g.Key.OpisZlecenia,
+                    OpisZlecenia = g.Key.Opis,
                     TotalHours = g.Sum(e => e.LiczbaGodzin) // Regular hours only, no overtime multipliers
                 })
                 .OrderBy(o => o.NrZlecenia)

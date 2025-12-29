@@ -1,0 +1,246 @@
+@model TaskFlow.ViewModels.EmployeeOvertimeReportViewModel
+@{
+    ViewData["Title"] = "Ilość nadgodzin pracowników";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5">⏰ Ilość nadgodzin pracowników</h1>
+            <p class="lead">Raport nadgodzin z mnożnikami według stref czasowych i dni tygodnia</p>
+        </div>
+    </div>
+
+    <form asp-action="EmployeeOvertime" method="post">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-funnel"></i> Filtry raportu</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <!-- Years -->
+                    <div class="col-md-3">
+                        <label class="form-label"><strong>Rok:</strong></label>
+                        <select asp-for="SelectedYears" class="form-select" multiple size="4">
+                            @foreach (var year in Model.AvailableYears)
+                            {
+                                <option value="@year">@year</option>
+                            }
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl aby wybrać wiele</small>
+                    </div>
+
+                    <!-- Months -->
+                    <div class="col-md-3">
+                        <label class="form-label"><strong>Miesiąc:</strong></label>
+                        <select asp-for="SelectedMonths" class="form-select" multiple size="4">
+                            <option value="1">Styczeń</option>
+                            <option value="2">Luty</option>
+                            <option value="3">Marzec</option>
+                            <option value="4">Kwiecień</option>
+                            <option value="5">Maj</option>
+                            <option value="6">Czerwiec</option>
+                            <option value="7">Lipiec</option>
+                            <option value="8">Sierpień</option>
+                            <option value="9">Wrzesień</option>
+                            <option value="10">Październik</option>
+                            <option value="11">Listopad</option>
+                            <option value="12">Grudzień</option>
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl aby wybrać wiele</small>
+                    </div>
+
+                    <!-- MPK -->
+                    <div class="col-md-3">
+                        <label class="form-label"><strong>MPK:</strong></label>
+                        <select asp-for="SelectedMPKs" class="form-select" multiple size="4">
+                            @foreach (var mpk in Model.AvailableMPKs)
+                            {
+                                <option value="@mpk">@mpk</option>
+                            }
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl aby wybrać wiele</small>
+                    </div>
+
+                    <!-- Firma -->
+                    <div class="col-md-3">
+                        <label class="form-label"><strong>Firma:</strong></label>
+                        <select asp-for="SelectedFirmas" class="form-select" multiple size="4">
+                            @foreach (var firma in Model.AvailableFirmas)
+                            {
+                                <option value="@firma">@firma</option>
+                            }
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl aby wybrać wiele</small>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="alert alert-info mb-3">
+                            <strong><i class="bi bi-info-circle"></i> Informacja o strefach czasowych:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li><strong>Poniedziałek-Piątek:</strong>
+                                    <ul>
+                                        <li>6:30-14:30: godziny standardowe (×1.0 - nie pokazane w raporcie)</li>
+                                        <li>14:30-21:00: nadgodziny ×1.5</li>
+                                        <li>21:00-6:30: nadgodziny nocne ×2.0</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Sobota:</strong> całość ×1.5</li>
+                                <li><strong>Niedziela i święta:</strong> całość ×2.0 + dodatkowy dzień wolny</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-bar-chart-fill"></i> Generuj raport
+                        </button>
+                        <a href="@Url.Action("Index", "Reports")" class="btn btn-secondary ms-2">
+                            <i class="bi bi-arrow-left"></i> Powrót do listy raportów
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    @if (Model.Data != null && Model.Data.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-table"></i> Wyniki raportu - Nadgodziny pracowników</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm mb-0">
+                        <thead class="table-dark sticky-top" style="background-color: #343a40; color: white;">
+                            <tr>
+                                <th class="sticky-left" style="left: 0; z-index: 10; background-color: #343a40; color: white;">Pracownik</th>
+                                @{
+                                    var allDates = Model.Data
+                                        .SelectMany(e => e.Days.Select(d => d.Date))
+                                        .Distinct()
+                                        .OrderBy(d => d)
+                                        .ToList();
+                                }
+                                @foreach (var date in allDates)
+                                {
+                                    <th class="text-center" style="min-width: 120px;">
+                                        @date.ToString("dd.MM.yyyy")<br/>
+                                        <small class="text-muted">@date.ToString("dddd", new System.Globalization.CultureInfo("pl-PL"))</small>
+                                    </th>
+                                }
+                                <th class="text-end" style="background-color: #f8f9fa; color: #212529;">Suma (nadgodziny)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var employee in Model.Data)
+                            {
+                                <tr class="table-row-hover" style="color: #e2e8f0;">
+                                    <td class="sticky-left" style="left: 0; z-index: 5; background-color: #f8f9fa; color: #212529; font-weight: bold;">
+                                        @employee.PracownikPelneImie
+                                    </td>
+                                    @foreach (var date in allDates)
+                                    {
+                                        var dayData = employee.Days.FirstOrDefault(d => d.Date == date);
+                                        <td class="text-center" style="color: #212529;">
+                                            @if (dayData != null)
+                                            {
+                                                <div>
+                                                    <strong>@dayData.StandardHours.ToString("F2") h</strong>
+                                                    <span class="badge bg-danger">×@dayData.Multiplier.ToString("F1")</span>
+                                                </div>
+                                                <div>
+                                                    <strong>= @dayData.OvertimeHours.ToString("F2") h</strong>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted">@dayData.TimeZone</small>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                    }
+                                    <td class="text-end" style="background-color: #f8f9fa; color: #212529;">
+                                        <strong>@employee.Days.Sum(d => d.OvertimeHours).ToString("F2") h</strong>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot style="background-color: #f8f9fa;">
+                            <tr style="color: #212529;">
+                                <th class="sticky-left" style="left: 0; z-index: 5; background-color: #f8f9fa;">Suma dzienna:</th>
+                                @foreach (var date in allDates)
+                                {
+                                    var dailyTotal = Model.Data
+                                        .SelectMany(e => e.Days)
+                                        .Where(d => d.Date == date)
+                                        .Sum(d => d.OvertimeHours);
+                                    <th class="text-center">@dailyTotal.ToString("F2") h</th>
+                                }
+                                <th class="text-end">
+                                    <strong>@Model.Data.SelectMany(e => e.Days).Sum(d => d.OvertimeHours).ToString("F2") h</strong>
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="alert alert-warning">
+                    <h6><i class="bi bi-exclamation-triangle"></i> Uwaga - Praca w niedzielę i święta</h6>
+                    <p class="mb-0">
+                        Za każdą pracę w niedzielę lub święto, pracownik automatycznie otrzymuje dodatkowy dzień wolny (jako urlop wypoczynkowy).
+                        System automatycznie dodaje te dni do sald urlopowych pracowników.
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+    else if (Model.Data != null)
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Brak nadgodzin dla wybranych filtrów. Spróbuj zmienić kryteria filtrowania.
+        </div>
+    }
+</div>
+
+<style>
+    .sticky-left {
+        position: sticky;
+        left: 0;
+        z-index: 5;
+        background-color: #f8f9fa;
+    }
+    
+    .table-row-hover {
+        transition: all 0.3s ease;
+        background: rgba(71, 85, 105, 0.1);
+    }
+    
+    .table-row-hover:hover {
+        background: rgba(245, 158, 11, 0.15) !important;
+        border-color: rgba(245, 158, 11, 0.4);
+        transform: translateX(2px);
+    }
+    
+    .table-dark {
+        background-color: #343a40;
+        color: white;
+    }
+    
+    thead.sticky-top {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+</style>

@@ -82,6 +82,56 @@
                 </div>
             </div>
         </div>
+
+        <!-- Report 4: Order Settlement -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">💰 Rozliczanie zlecenia</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Raport rozliczenia kosztów pracy (godziny × stawka) z podziałem na prowadzone prace.
+                    </p>
+                    <ul class="small">
+                        <li>Filtrowanie: Rok, Miesiąc, MPK, Firma, Nr zlecenia</li>
+                        <li>Godziny × stawka pracownika</li>
+                        <li>Podział na "Prowadzone prace"</li>
+                        <li>Bez mnożników nadgodzin</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="@Url.Action("OrderSettlement", "Reports")" class="btn btn-warning w-100">
+                        <i class="bi bi-currency-exchange"></i> Otwórz raport
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report 5: Employee Overtime -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">⏰ Ilość nadgodzin pracowników</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Raport nadgodzin z mnożnikami według stref czasowych i dni tygodnia.
+                    </p>
+                    <ul class="small">
+                        <li>Filtrowanie: Rok, Miesiąc, MPK, Firma</li>
+                        <li>Strefy czasowe: 6:30-14:30 (×1.0), 14:30-21:00 (×1.5), 21:00-6:30 (×2.0)</li>
+                        <li>Sobota: ×1.5, Niedziela/Święto: ×2.0</li>
+                        <li>Tylko nadgodziny</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="@Url.Action("EmployeeOvertime", "Reports")" class="btn btn-danger w-100">
+                        <i class="bi bi-clock-history"></i> Otwórz raport
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row mt-5">
@@ -89,8 +139,12 @@
             <div class="alert alert-info">
                 <h6><i class="bi bi-info-circle"></i> Informacja</h6>
                 <p class="mb-0">
-                    Wszystkie raporty są dynamiczne i liczą się na żywo z aktualnych danych w bazie danych.
+                    Wszystkie **5 raportów** są dynamiczne i liczą się na żywo z aktualnych danych w bazie danych.
                     Możesz filtrować dane według różnych kryteriów, aby uzyskać dokładne informacje.
+                    <br><br>
+                    <strong>Nowe raporty:</strong>
+                    <br>• <strong>Rozliczanie zlecenia</strong> - koszty pracy (godziny × stawka) z podziałem na prowadzone prace
+                    <br>• <strong>Ilość nadgodzin pracowników</strong> - nadgodziny z mnożnikami według stref czasowych (1.5x, 2.0x) i dni tygodnia
                 </p>
             </div>
         </div>

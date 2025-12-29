@@ -417,5 +417,283 @@ namespace TaskFlow.Controllers
             ViewBag.Summary = summary;
             return View();
         }
+
+        // NEW REPORT 4: Order Settlement Report (Rozliczanie zlecenia)
+        [HttpGet]
+        public async Task<IActionResult> OrderSettlement()
+        {
+            var model = new OrderSettlementReportViewModel();
+            
+            // Populate available filter options
+            model.AvailableYears = await _context.EwidencjaCzasu
+                .Select(e => e.Data.Year)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToListAsync();
+                
+            model.AvailableMPKs = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.MPK))
+                .Select(p => p.MPK!)
+                .Distinct()
+                .OrderBy(m => m)
+                .ToListAsync();
+                
+            model.AvailableFirmas = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.Firma))
+                .Select(p => p.Firma!)
+                .Distinct()
+                .OrderBy(f => f)
+                .ToListAsync();
+
+            model.AvailableOrderNumbers = await _context.Zlecenia
+                .Select(z => z.NrZlecenia)
+                .Distinct()
+                .OrderBy(n => n)
+                .ToListAsync();
+            
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> OrderSettlement(OrderSettlementReportViewModel model)
+        {
+            // Repopulate filter options
+            model.AvailableYears = await _context.EwidencjaCzasu
+                .Select(e => e.Data.Year)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToListAsync();
+                
+            model.AvailableMPKs = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.MPK))
+                .Select(p => p.MPK!)
+                .Distinct()
+                .OrderBy(m => m)
+                .ToListAsync();
+                
+            model.AvailableFirmas = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.Firma))
+                .Select(p => p.Firma!)
+                .Distinct()
+                .OrderBy(f => f)
+                .ToListAsync();
+
+            model.AvailableOrderNumbers = await _context.Zlecenia
+                .Select(z => z.NrZlecenia)
+                .Distinct()
+                .OrderBy(n => n)
+                .ToListAsync();
+
+            // Apply filters
+            var query = _context.EwidencjaCzasu
+                .Include(e => e.Pracownik)
+                .Include(e => e.Zlecenie)
+                .AsQueryable();
+
+            // Filter by years and months
+            if (model.SelectedYears != null && model.SelectedYears.Any())
+            {
+                if (model.SelectedMonths != null && model.SelectedMonths.Any())
+                {
+                    query = query.Where(e => model.SelectedYears.Contains(e.Data.Year) && 
+                                            model.SelectedMonths.Contains(e.Data.Month));
+                }
+                else
+                {
+                    query = query.Where(e => model.SelectedYears.Contains(e.Data.Year));
+                }
+            }
+
+            // Filter by MPK
+            if (model.SelectedMPKs != null && model.SelectedMPKs.Any())
+            {
+                query = query.Where(e => e.Pracownik.MPK != null && model.SelectedMPKs.Contains(e.Pracownik.MPK));
+            }
+
+            // Filter by Firma
+            if (model.SelectedFirmas != null && model.SelectedFirmas.Any())
+            {
+                query = query.Where(e => e.Pracownik.Firma != null && model.SelectedFirmas.Contains(e.Pracownik.Firma));
+            }
+
+            // Filter by Order Numbers
+            if (model.SelectedOrderNumbers != null && model.SelectedOrderNumbers.Any())
+            {
+                query = query.Where(e => model.SelectedOrderNumbers.Contains(e.Zlecenie.NrZlecenia));
+            }
+
+            var data = await query.ToListAsync();
+
+            // Group by order, then by work description (OpisPrac), then by employee
+            var grouped = data
+                .GroupBy(e => new { e.ZlecenieId, e.Zlecenie.NrZlecenia, e.Zlecenie.Opis })
+                .Select(orderGroup => new OrderSettlementRow
+                {
+                    ZlecenieId = orderGroup.Key.ZlecenieId,
+                    NrZlecenia = orderGroup.Key.NrZlecenia,
+                    OpisZlecenia = orderGroup.Key.Opis,
+                    WorkGroups = orderGroup
+                        .GroupBy(e => e.OpisPrac ?? string.Empty)
+                        .Select(workGroup => new WorkDescriptionGroup
+                        {
+                            OpisPrac = workGroup.Key,
+                            EmployeeDetails = workGroup
+                                .GroupBy(e => new { e.PracownikId, e.Pracownik.Imie, e.Pracownik.Nazwisko, e.Pracownik.StawkaZlH })
+                                .Select(empGroup => new EmployeeWorkDetail
+                                {
+                                    PracownikId = empGroup.Key.PracownikId,
+                                    PracownikImie = empGroup.Key.Imie,
+                                    PracownikNazwisko = empGroup.Key.Nazwisko,
+                                    Hours = empGroup.Sum(e => e.LiczbaGodzin), // Regular hours only, no overtime multipliers
+                                    StawkaZlH = empGroup.Key.StawkaZlH ?? 0m
+                                })
+                                .OrderBy(emp => emp.PracownikNazwisko)
+                                .ThenBy(emp => emp.PracownikImie)
+                                .ToList()
+                        })
+                        .OrderBy(wg => wg.OpisPrac)
+                        .ToList()
+                })
+                .OrderBy(o => o.NrZlecenia)
+                .ToList();
+
+            model.Data = grouped;
+            return View(model);
+        }
+
+        // NEW REPORT 5: Employee Overtime Report (Ilość nadgodzin pracowników)
+        [HttpGet]
+        public async Task<IActionResult> EmployeeOvertime()
+        {
+            var model = new EmployeeOvertimeReportViewModel();
+            
+            // Populate available filter options
+            model.AvailableYears = await _context.EwidencjaCzasu
+                .Select(e => e.Data.Year)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToListAsync();
+                
+            model.AvailableMPKs = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.MPK))
+                .Select(p => p.MPK!)
+                .Distinct()
+                .OrderBy(m => m)
+                .ToListAsync();
+                
+            model.AvailableFirmas = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.Firma))
+                .Select(p => p.Firma!)
+                .Distinct()
+                .OrderBy(f => f)
+                .ToListAsync();
+            
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EmployeeOvertime(EmployeeOvertimeReportViewModel model)
+        {
+            // Repopulate filter options
+            model.AvailableYears = await _context.EwidencjaCzasu
+                .Select(e => e.Data.Year)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToListAsync();
+                
+            model.AvailableMPKs = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.MPK))
+                .Select(p => p.MPK!)
+                .Distinct()
+                .OrderBy(m => m)
+                .ToListAsync();
+                
+            model.AvailableFirmas = await _context.Pracownicy
+                .Where(p => !string.IsNullOrEmpty(p.Firma))
+                .Select(p => p.Firma!)
+                .Distinct()
+                .OrderBy(f => f)
+                .ToListAsync();
+
+            // Apply filters
+            var query = _context.EwidencjaCzasu
+                .Include(e => e.Pracownik)
+                .AsQueryable();
+
+            // Filter by years and months
+            if (model.SelectedYears != null && model.SelectedYears.Any())
+            {
+                if (model.SelectedMonths != null && model.SelectedMonths.Any())
+                {
+                    query = query.Where(e => model.SelectedYears.Contains(e.Data.Year) && 
+                                            model.SelectedMonths.Contains(e.Data.Month));
+                }
+                else
+                {
+                    query = query.Where(e => model.SelectedYears.Contains(e.Data.Year));
+                }
+            }
+
+            // Filter by MPK
+            if (model.SelectedMPKs != null && model.SelectedMPKs.Any())
+            {
+                query = query.Where(e => e.Pracownik.MPK != null && model.SelectedMPKs.Contains(e.Pracownik.MPK));
+            }
+
+            // Filter by Firma
+            if (model.SelectedFirmas != null && model.SelectedFirmas.Any())
+            {
+                query = query.Where(e => e.Pracownik.Firma != null && model.SelectedFirmas.Contains(e.Pracownik.Firma));
+            }
+
+            var data = await query
+                .OrderBy(e => e.Pracownik.Nazwisko)
+                .ThenBy(e => e.Pracownik.Imie)
+                .ThenBy(e => e.Data)
+                .ToListAsync();
+
+            // Filter only overtime entries using OvertimeCalculator
+            var overtimeData = data
+                .Where(e => TaskFlow.Helpers.OvertimeCalculator.IsOvertime(e.Data, e.GodzinaOd))
+                .ToList();
+
+            // Group by employee and calculate overtime with multipliers
+            var grouped = overtimeData
+                .GroupBy(e => new { e.PracownikId, e.Pracownik.Imie, e.Pracownik.Nazwisko })
+                .Select(g => new EmployeeOvertimeRow
+                {
+                    PracownikId = g.Key.PracownikId,
+                    PracownikImie = g.Key.Imie,
+                    PracownikNazwisko = g.Key.Nazwisko,
+                    Days = g.GroupBy(e => e.Data)
+                        .Select(d =>
+                        {
+                            // Calculate overtime details for each day
+                            var entries = d.ToList();
+                            var firstEntry = entries.First();
+                            var overtimeDetails = TaskFlow.Helpers.OvertimeCalculator.CalculateOvertimeMultiplier(
+                                firstEntry.Data,
+                                firstEntry.GodzinaOd,
+                                firstEntry.GodzinaDo,
+                                entries.Sum(e => e.LiczbaGodzin)
+                            );
+
+                            return new DayOvertime
+                            {
+                                Date = d.Key,
+                                DayOfWeek = d.Key.ToString("dddd", new CultureInfo("pl-PL")),
+                                StandardHours = overtimeDetails.StandardHours,
+                                Multiplier = overtimeDetails.Multiplier,
+                                TimeZone = overtimeDetails.TimeZone
+                            };
+                        })
+                        .OrderBy(d => d.Date)
+                        .ToList()
+                })
+                .ToList();
+
+            model.Data = grouped;
+            return View(model);
+        }
     }
 }

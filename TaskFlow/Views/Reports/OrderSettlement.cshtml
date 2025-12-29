@@ -1,0 +1,199 @@
+@model TaskFlow.ViewModels.OrderSettlementReportViewModel
+@{
+    ViewData["Title"] = "Rozliczanie zlecenia";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5">💰 Rozliczanie zlecenia</h1>
+            <p class="lead">Raport kosztów pracy z podziałem na prowadzone prace (godziny × stawka pracownika)</p>
+        </div>
+    </div>
+
+    <form asp-action="OrderSettlement" method="post">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-funnel"></i> Filtry raportu</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <!-- Years -->
+                    <div class="col-md-3">
+                        <label class="form-label"><strong>Rok:</strong></label>
+                        <select asp-for="SelectedYears" class="form-select" multiple size="4">
+                            @foreach (var year in Model.AvailableYears)
+                            {
+                                <option value="@year">@year</option>
+                            }
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl aby wybrać wiele</small>
+                    </div>
+
+                    <!-- Months -->
+                    <div class="col-md-3">
+                        <label class="form-label"><strong>Miesiąc:</strong></label>
+                        <select asp-for="SelectedMonths" class="form-select" multiple size="4">
+                            <option value="1">Styczeń</option>
+                            <option value="2">Luty</option>
+                            <option value="3">Marzec</option>
+                            <option value="4">Kwiecień</option>
+                            <option value="5">Maj</option>
+                            <option value="6">Czerwiec</option>
+                            <option value="7">Lipiec</option>
+                            <option value="8">Sierpień</option>
+                            <option value="9">Wrzesień</option>
+                            <option value="10">Październik</option>
+                            <option value="11">Listopad</option>
+                            <option value="12">Grudzień</option>
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl aby wybrać wiele</small>
+                    </div>
+
+                    <!-- MPK -->
+                    <div class="col-md-2">
+                        <label class="form-label"><strong>MPK:</strong></label>
+                        <select asp-for="SelectedMPKs" class="form-select" multiple size="4">
+                            @foreach (var mpk in Model.AvailableMPKs)
+                            {
+                                <option value="@mpk">@mpk</option>
+                            }
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl aby wybrać wiele</small>
+                    </div>
+
+                    <!-- Firma -->
+                    <div class="col-md-2">
+                        <label class="form-label"><strong>Firma:</strong></label>
+                        <select asp-for="SelectedFirmas" class="form-select" multiple size="4">
+                            @foreach (var firma in Model.AvailableFirmas)
+                            {
+                                <option value="@firma">@firma</option>
+                            }
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl aby wybrać wiele</small>
+                    </div>
+
+                    <!-- Order Numbers -->
+                    <div class="col-md-2">
+                        <label class="form-label"><strong>Nr zlecenia:</strong></label>
+                        <select asp-for="SelectedOrderNumbers" class="form-select" multiple size="4">
+                            @foreach (var orderNr in Model.AvailableOrderNumbers)
+                            {
+                                <option value="@orderNr">@orderNr</option>
+                            }
+                        </select>
+                        <small class="text-muted">Przytrzymaj Ctrl aby wybrać wiele</small>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-bar-chart-fill"></i> Generuj raport
+                        </button>
+                        <a href="@Url.Action("Index", "Reports")" class="btn btn-secondary ms-2">
+                            <i class="bi bi-arrow-left"></i> Powrót do listy raportów
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    @if (Model.Data != null && Model.Data.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-table"></i> Wyniki raportu - Rozliczanie zlecenia</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    @foreach (var order in Model.Data)
+                    {
+                        <div class="p-3 border-bottom">
+                            <h5 class="mb-2" style="color: #212529;">
+                                <strong>Zlecenie:</strong> @order.NrZlecenia - @order.OpisZlecenia
+                            </h5>
+
+                            @foreach (var workGroup in order.WorkGroups)
+                            {
+                                <div class="ms-3 mb-3">
+                                    <h6 class="text-muted mb-2">
+                                        <i class="bi bi-wrench"></i> <strong>Prowadzone prace:</strong> @workGroup.DisplayOpisPrac
+                                    </h6>
+
+                                    <table class="table table-sm table-bordered">
+                                        <thead class="table-dark" style="background-color: #343a40; color: white;">
+                                            <tr>
+                                                <th>Pracownik</th>
+                                                <th class="text-end">Godziny</th>
+                                                <th class="text-end">Stawka (zł/h)</th>
+                                                <th class="text-end">Koszt (zł)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var emp in workGroup.EmployeeDetails)
+                                            {
+                                                <tr style="color: #212529;">
+                                                    <td>@emp.PracownikPelneImie</td>
+                                                    <td class="text-end">@emp.Hours.ToString("F2")</td>
+                                                    <td class="text-end">@emp.StawkaZlH.ToString("F2")</td>
+                                                    <td class="text-end"><strong>@emp.Cost.ToString("F2")</strong></td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                        <tfoot style="background-color: #f8f9fa;">
+                                            <tr style="color: #212529;">
+                                                <th>Suma dla pracy:</th>
+                                                <th class="text-end">@workGroup.TotalHours.ToString("F2") h</th>
+                                                <th></th>
+                                                <th class="text-end">@workGroup.TotalCost.ToString("F2") zł</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            }
+
+                            <div class="alert alert-warning ms-3 mb-0">
+                                <strong>Suma dla zlecenia @order.NrZlecenia:</strong> 
+                                @order.TotalHours.ToString("F2") godzin | 
+                                <strong>@order.TotalCost.ToString("F2") zł</strong>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="p-3 bg-light border-top" style="color: #212529;">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calculator"></i> Łączna suma: 
+                        <strong>@Model.Data.Sum(o => o.TotalHours).ToString("F2") godzin</strong> | 
+                        <strong>@Model.Data.Sum(o => o.TotalCost).ToString("F2") zł</strong>
+                    </h5>
+                </div>
+            </div>
+        </div>
+    }
+    else if (Model.Data != null)
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Brak danych dla wybranych filtrów. Spróbuj zmienić kryteria filtrowania.
+        </div>
+    }
+</div>
+
+<style>
+    .table-row-hover {
+        transition: all 0.3s ease;
+        background: rgba(71, 85, 105, 0.1);
+    }
+    .table-row-hover:hover {
+        background: rgba(245, 158, 11, 0.15) !important;
+        border-color: rgba(245, 158, 11, 0.4);
+        transform: translateX(2px);
+    }
+    .table-dark {
+        background-color: #343a40;
+        color: white;
+    }
+</style>

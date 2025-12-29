@@ -113,6 +113,13 @@ public class HomeController : Controller
             
             _context.EwidencjaCzasu.RemoveRange(existingEntries);
 
+            // Check if this is Sunday or holiday - for vacation day addition
+            bool isSundayOrHoliday = dataObj.DayOfWeek == DayOfWeek.Sunday || 
+                                      TaskFlow.Helpers.PolishHolidays.IsHoliday(dataObj);
+
+            // Track which employees worked on Sunday/holiday for vacation day addition
+            var employeesWorkedSundayHoliday = new HashSet<int>();
+
             // Add new entries
             foreach (var entry in request.Entries)
             {
@@ -154,6 +161,25 @@ public class HomeController : Controller
                 };
 
                 _context.EwidencjaCzasu.Add(ewidencja);
+
+                // Track employee for vacation day if worked on Sunday/holiday
+                if (isSundayOrHoliday && totalHours > 0)
+                {
+                    employeesWorkedSundayHoliday.Add(entry.PracownikId);
+                }
+            }
+
+            // Add vacation days for employees who worked on Sunday/holiday
+            if (employeesWorkedSundayHoliday.Any())
+            {
+                var employees = await _context.Pracownicy
+                    .Where(p => employeesWorkedSundayHoliday.Contains(p.Id))
+                    .ToListAsync();
+
+                foreach (var employee in employees)
+                {
+                    employee.LiczbaDniWolnych += 1; // Add 1 vacation day
+                }
             }
 
             await _context.SaveChangesAsync();

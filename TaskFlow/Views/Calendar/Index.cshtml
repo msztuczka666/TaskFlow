@@ -1,0 +1,204 @@
+@model List<TaskFlow.Controllers.CalendarDay>
+
+@{
+    ViewData["Title"] = "Kalendarz";
+    var year = ViewBag.SelectedYear;
+    var month = ViewBag.SelectedMonth;
+    var monthName = ViewBag.MonthName;
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="mb-4">📅 Kalendarz - @monthName</h2>
+            
+            <!-- Month/Year selector -->
+            <form method="get" class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label for="year" class="form-label">Rok</label>
+                    <select name="year" id="year" class="form-select">
+                        @for (int y = DateTime.Now.Year - 2; y <= DateTime.Now.Year + 5; y++)
+                        {
+                            <option value="@y" selected="@(y == year)">@y</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="month" class="form-label">Miesiąc</label>
+                    <select name="month" id="month" class="form-select">
+                        <option value="1" selected="@(month == 1)">Styczeń</option>
+                        <option value="2" selected="@(month == 2)">Luty</option>
+                        <option value="3" selected="@(month == 3)">Marzec</option>
+                        <option value="4" selected="@(month == 4)">Kwiecień</option>
+                        <option value="5" selected="@(month == 5)">Maj</option>
+                        <option value="6" selected="@(month == 6)">Czerwiec</option>
+                        <option value="7" selected="@(month == 7)">Lipiec</option>
+                        <option value="8" selected="@(month == 8)">Sierpień</option>
+                        <option value="9" selected="@(month == 9)">Wrzesień</option>
+                        <option value="10" selected="@(month == 10)">Październik</option>
+                        <option value="11" selected="@(month == 11)">Listopad</option>
+                        <option value="12" selected="@(month == 12)">Grudzień</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Pokaż</button>
+                </div>
+            </form>
+
+            <!-- Legend -->
+            <div class="alert alert-info mb-4">
+                <strong>Legenda:</strong>
+                <span class="ms-3"><span class="badge bg-danger">Święto</span> - Polskie święto państwowe</span>
+                <span class="ms-3"><span class="badge bg-warning text-dark">Sobota</span></span>
+                <span class="ms-3"><span class="badge bg-info text-dark">Niedziela</span></span>
+            </div>
+
+            <!-- Calendar grid -->
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <table class="table table-bordered table-hover mb-0 calendar-table">
+                        <thead>
+                            <tr class="bg-dark text-white text-center">
+                                <th class="py-3">Poniedziałek</th>
+                                <th class="py-3">Wtorek</th>
+                                <th class="py-3">Środa</th>
+                                <th class="py-3">Czwartek</th>
+                                <th class="py-3">Piątek</th>
+                                <th class="py-3 bg-warning text-dark">Sobota</th>
+                                <th class="py-3 bg-info text-dark">Niedziela</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var weeks = Model.Count / 7;
+                                for (int week = 0; week < weeks; week++)
+                                {
+                                    <tr>
+                                        @for (int day = 0; day < 7; day++)
+                                        {
+                                            var calDay = Model[week * 7 + day];
+                                            var cellClass = "text-center align-middle";
+                                            var bgClass = "";
+                                            var textClass = "";
+                                            
+                                            if (!calDay.IsCurrentMonth)
+                                            {
+                                                bgClass = "bg-light";
+                                                textClass = "text-muted";
+                                            }
+                                            else if (calDay.IsHoliday)
+                                            {
+                                                bgClass = "bg-danger bg-opacity-25";
+                                                textClass = "text-danger fw-bold";
+                                            }
+                                            else if (calDay.IsWeekend)
+                                            {
+                                                if (calDay.Date.DayOfWeek == DayOfWeek.Saturday)
+                                                {
+                                                    bgClass = "bg-warning bg-opacity-10";
+                                                    textClass = "text-dark";
+                                                }
+                                                else
+                                                {
+                                                    bgClass = "bg-info bg-opacity-10";
+                                                    textClass = "text-dark";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                bgClass = "bg-white";
+                                                textClass = "text-dark";
+                                            }
+
+                                            <td class="@cellClass @bgClass @textClass calendar-day" style="height: 100px; vertical-align: top; padding: 10px;">
+                                                <div class="day-number" style="font-size: 1.2rem; font-weight: 600;">
+                                                    @calDay.Date.Day
+                                                </div>
+                                                @if (calDay.IsCurrentMonth && calDay.IsHoliday)
+                                                {
+                                                    <div class="mt-2">
+                                                        <span class="badge bg-danger text-white" style="font-size: 0.75rem;">Święto</span>
+                                                    </div>
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Navigation buttons -->
+            <div class="row mt-4">
+                <div class="col-md-12 d-flex justify-content-between">
+                    <a href="?year=@(month == 1 ? year - 1 : year)&month=@(month == 1 ? 12 : month - 1)" 
+                       class="btn btn-secondary">
+                        ← Poprzedni miesiąc
+                    </a>
+                    <a href="?year=@DateTime.Now.Year&month=@DateTime.Now.Month" 
+                       class="btn btn-primary">
+                        Dzisiaj
+                    </a>
+                    <a href="?year=@(month == 12 ? year + 1 : year)&month=@(month == 12 ? 1 : month + 1)" 
+                       class="btn btn-secondary">
+                        Następny miesiąc →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .calendar-table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .calendar-table th {
+        border: 1px solid #dee2e6;
+        font-weight: 600;
+    }
+    
+    .calendar-table td {
+        border: 1px solid #dee2e6;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .calendar-table td:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        z-index: 10;
+    }
+    
+    .calendar-day {
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .day-number {
+        margin-bottom: 5px;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        // Highlight today's date
+        document.addEventListener('DOMContentLoaded', function() {
+            var today = new Date();
+            var cells = document.querySelectorAll('.calendar-day');
+            
+            cells.forEach(function(cell) {
+                var dayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                if (dayNumber === today.getDate() && 
+                    @month === (today.getMonth() + 1) && 
+                    @year === today.getFullYear()) {
+                    cell.style.border = '3px solid #0d6efd';
+                    cell.style.boxShadow = '0 0 10px rgba(13, 110, 253, 0.5)';
+                }
+            });
+        });
+    </script>
+}

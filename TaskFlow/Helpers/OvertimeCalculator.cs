@@ -23,6 +23,12 @@ namespace TaskFlow.Helpers
                 new DateTime(year, 12, 26)  // Boże Narodzenie (drugi dzień)
             };
 
+            // Od 1 stycznia 2025 Wigilia (24 grudnia) jest świętem i dniem wolnym od pracy
+            if (year >= 2025)
+            {
+                holidays.Add(new DateTime(year, 12, 24)); // Wigilia
+            }
+
             // Święta ruchome (zależne od Wielkanocy)
             var easter = CalculateEaster(year);
             holidays.Add(easter);                          // Wielkanoc (niedziela)

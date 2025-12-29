@@ -37,18 +37,18 @@
                     @foreach (var item in Model)
                     {
                         <tr class="table-row-hover">
-                            <td style="color: #e2e8f0;">@item.Pracownik.Imie @item.Pracownik.Nazwisko</td>
+                            <td>@item.Pracownik.Imie @item.Pracownik.Nazwisko</td>
                             <td><span class="badge bg-secondary">@item.TypNieobecnosci</span></td>
-                            <td style="color: #e2e8f0;">@item.DataOd.ToString("dd.MM.yyyy")</td>
-                            <td style="color: #e2e8f0;">@item.DataDo.ToString("dd.MM.yyyy")</td>
-                            <td style="color: #e2e8f0;">@item.LiczbaDni</td>
-                            <td style="color: #e2e8f0;">@(item.Uwagi ?? "-")</td>
+                            <td>@item.DataOd.ToString("dd.MM.yyyy")</td>
+                            <td>@item.DataDo.ToString("dd.MM.yyyy")</td>
+                            <td>@item.LiczbaDni</td>
+                            <td>@(item.Uwagi ?? "-")</td>
                             <td>
                                 <div class="btn-group" role="group">
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Szczegóły</a>
                                     @if (User.IsInRole("Admin") || User.IsInRole("Kierownik") || User.IsInRole("Specjalista"))
                                     {
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edytuj</a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning text-dark">Edytuj</a>
                                     }
                                     @if (User.IsInRole("Admin") || User.IsInRole("Kierownik"))
                                     {
@@ -71,7 +71,8 @@
 <style>
     .table-row-hover {
         transition: all 0.3s ease;
-        background: rgba(71, 85, 105, 0.1);
+        background: #ffffff;
+        color: #212529;
     }
     .table-row-hover:hover {
         background: rgba(245, 158, 11, 0.15) !important;
@@ -81,5 +82,8 @@
     .table-dark {
         background-color: #343a40;
         color: white;
+    }
+    .table-row-hover td {
+        color: #212529;
     }
 </style>

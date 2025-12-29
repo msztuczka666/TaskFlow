@@ -10,9 +10,9 @@
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">Import pracowników z Excel</h5>
             </div>
-            <div class="card-body">
-                <p>Format pliku Excel:</p>
-                <ul>
+            <div class="card-body" style="background-color: #ffffff; color: #212529;">
+                <p style="color: #212529;">Format pliku Excel:</p>
+                <ul style="color: #212529;">
                     <li>Kolumna 1: Imię</li>
                     <li>Kolumna 2: Nazwisko</li>
                     <li>Kolumna 3: Firma główna</li>
@@ -35,9 +35,9 @@
             <div class="card-header bg-success text-white">
                 <h5 class="mb-0">Import nieobecności z Excel</h5>
             </div>
-            <div class="card-body">
-                <p>Format pliku Excel:</p>
-                <ul>
+            <div class="card-body" style="background-color: #ffffff; color: #212529;">
+                <p style="color: #212529;">Format pliku Excel:</p>
+                <ul style="color: #212529;">
                     <li>Kolumna 1: ID Pracownika</li>
                     <li>Kolumna 2: Data od (format: DD.MM.YYYY)</li>
                     <li>Kolumna 3: Data do (format: DD.MM.YYYY)</li>
@@ -56,4 +56,27 @@
     </div>
 </div>
 
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header" style="background-color: #6c757d; color: white;">
+                <h5 class="mb-0">Dostępne typy nieobecności</h5>
+            </div>
+            <div class="card-body" style="background-color: #ffffff; color: #212529;">
+                <ul style="color: #212529;">
+                    <li>Urlop</li>
+                    <li>Choroba</li>
+                    <li>Szkolenie</li>
+                    <li>Odbiór krwi (automatycznie 2 dni)</li>
+                    <li>Okres zasiłek</li>
+                    <li>Działalność gospodarcza</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center my-4">
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Powrót do Dashboard</a>
+</div>
 

@@ -16,8 +16,8 @@
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
+            <table class="table">
+                <thead class="table-dark">
                     <tr>
                         <th>Nr zlecenia</th>
                         <th>Opis zlecenia</th>
@@ -29,11 +29,11 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        <tr>
-                            <td>@item.NrZlecenia</td>
-                            <td>@item.Opis</td>
-                            <td>@item.LiczbaDniRoboczych</td>
-                            <td>
+                        <tr class="table-row-hover">
+                            <td style="color: #e2e8f0;">@item.NrZlecenia</td>
+                            <td style="color: #e2e8f0;">@item.Opis</td>
+                            <td style="color: #e2e8f0;">@item.LiczbaDniRoboczych</td>
+                            <td style="color: #e2e8f0;">
                                 @if (item.Status == "Aktywne")
                                 {
                                     <span class="badge bg-success">Aktywne</span>
@@ -71,3 +71,19 @@
         }
     </div>
 </div>
+
+<style>
+    .table-row-hover {
+        transition: all 0.3s ease;
+        background: rgba(71, 85, 105, 0.1);
+    }
+    .table-row-hover:hover {
+        background: rgba(245, 158, 11, 0.15) !important;
+        border-color: rgba(245, 158, 11, 0.4);
+        transform: translateX(2px);
+    }
+    .table-dark {
+        background-color: #343a40;
+        color: white;
+    }
+</style>

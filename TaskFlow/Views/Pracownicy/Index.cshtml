@@ -16,8 +16,8 @@
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
+            <table class="table">
+                <thead class="table-dark">
                     <tr>
                         <th>Imię</th>
                         <th>Nazwisko</th>
@@ -31,13 +31,13 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        <tr>
-                            <td>@item.Imie</td>
-                            <td>@item.Nazwisko</td>
-                            <td>@(item.Firma ?? "-")</td>
-                            <td>@(item.NrPrzepustki ?? "-")</td>
-                            <td>@(item.MPK ?? "-")</td>
-                            <td>@(item.FirmaId ?? "-")</td>
+                        <tr class="table-row-hover">
+                            <td style="color: #e2e8f0;">@item.Imie</td>
+                            <td style="color: #e2e8f0;">@item.Nazwisko</td>
+                            <td style="color: #e2e8f0;">@(item.Firma ?? "-")</td>
+                            <td style="color: #e2e8f0;">@(item.NrPrzepustki ?? "-")</td>
+                            <td style="color: #e2e8f0;">@(item.MPK ?? "-")</td>
+                            <td style="color: #e2e8f0;">@(item.FirmaId ?? "-")</td>
                             <td>
                                 <div class="btn-group" role="group">
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Szczegóły</a>
@@ -62,3 +62,19 @@
         }
     </div>
 </div>
+
+<style>
+    .table-row-hover {
+        transition: all 0.3s ease;
+        background: rgba(71, 85, 105, 0.1);
+    }
+    .table-row-hover:hover {
+        background: rgba(245, 158, 11, 0.15) !important;
+        border-color: rgba(245, 158, 11, 0.4);
+        transform: translateX(2px);
+    }
+    .table-dark {
+        background-color: #343a40;
+        color: white;
+    }
+</style>

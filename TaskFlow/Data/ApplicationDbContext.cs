@@ -106,11 +106,11 @@ namespace TaskFlow.Data
             {
                 var auditLog = new AuditLog
                 {
-                    Id = Guid.NewGuid(),
-                    EntityName = entry.Entity.GetType().Name,
+                    EntityType = entry.Entity.GetType().Name,
                     Action = entry.State.ToString(),
                     Timestamp = DateTime.UtcNow,
                     UserId = userName,
+                    UserName = userName,
                     IpAddress = ipAddress,
                     UserAgent = userAgent
                 };

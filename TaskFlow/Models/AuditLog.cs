@@ -29,9 +29,9 @@ namespace TaskFlow.Models
         [Required]
         public DateTime Timestamp { get; set; }
 
-        public string OldValues { get; set; } // JSON
+        public string? OldValues { get; set; } // JSON
 
-        public string NewValues { get; set; } // JSON
+        public string? NewValues { get; set; } // JSON
 
         [MaxLength(45)]
         public string IpAddress { get; set; }

@@ -102,6 +102,7 @@ if (isset($_GET['logged_out']) && $_GET['logged_out'] === '1') {
                         type="checkbox" 
                         id="rememberMe" 
                         name="remember_me"
+                        value="1"
                     >
                     <label for="rememberMe">Remember me for 30 days</label>
                 </div>

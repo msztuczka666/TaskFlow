@@ -1,0 +1,23 @@
+{
+    "name": "taskflow/taskflow",
+    "description": "Employee and task management system",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mariusz Sztuczka",
+            "email": "msztuczka666@example.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "TaskFlow\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

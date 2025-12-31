@@ -38,6 +38,11 @@ $errorMessage = $session->get('error');
 $successMessage = $session->get('success');
 $session->remove('error');
 $session->remove('success');
+
+// Check for logout success message
+if (isset($_GET['logged_out']) && $_GET['logged_out'] === '1') {
+    $successMessage = 'You have been logged out successfully';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

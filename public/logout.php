@@ -24,10 +24,6 @@ $authController = new AuthController($userModel, $session, $config);
 // Logout user
 $authController->logout();
 
-// Set success message
-$session->start(); // Restart session to set message
-$session->set('success', 'You have been logged out successfully');
-
-// Redirect to login page
-header('Location: index.php');
+// Redirect to login page with success message
+header('Location: index.php?logged_out=1');
 exit;

@@ -46,10 +46,14 @@ try {
         echo "Test 4: Database query... ";
         try {
             $result = $database->fetchAll("SHOW TABLES");
-            $tables = array_column($result, 'Tables_in_' . $config['database']['database']);
-            echo "✓ PASSED (Found " . count($tables) . " tables)\n";
+            $tableCount = count($result);
+            echo "✓ PASSED (Found " . $tableCount . " tables)\n";
             
-            if (count($tables) > 0) {
+            if ($tableCount > 0) {
+                // Extract table names from result (works across different DB configurations)
+                $tables = array_map(function($row) {
+                    return reset($row); // Get first value from each row
+                }, $result);
                 echo "   Tables: " . implode(", ", $tables) . "\n";
             }
         } catch (Exception $e) {

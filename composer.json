@@ -5,8 +5,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Mariusz Sztuczka",
-            "email": "msztuczka666@example.com"
+            "name": "Mariusz Sztuczka"
         }
     ],
     "require": {
